@@ -4,7 +4,7 @@ const StateContext = createContext();
 const initialState = {
     chat: false,
     search: false,
-    cart: false,
+
     userProfile: false,
     notification: false,
 };
@@ -31,7 +31,7 @@ export const ContextProvider = ({ children }) => {
         setIsClicked({
             chat: false,
             search: false,
-            cart: false,
+
             userProfile: false,
             notification: false,
             [clicked]: true,
