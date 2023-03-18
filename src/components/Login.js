@@ -1,6 +1,7 @@
 import * as React from 'react';
 // import { BrowserRouter, Routes, Route } from 'react-router-dom';
 // import ForgotPass from './ForgotPass';
+import { Link } from 'react-router-dom';
 
 export default function Form({ setUser, setAuthState }) {
     return (
@@ -27,13 +28,9 @@ export default function Form({ setUser, setAuthState }) {
                             Nhớ mật khẩu
                         </label>
                     </div>
-                    <a className="font-medium text-base text-violet-500">Quên Mật khẩu</a>
-                    {/*   <Routes>
-                      
-                       
-                        <Route path="/forgotPass" element=<ForgotPass /> />
-                    </Routes>
-                  */}
+                    <Link to={'/forgetPass'} key={'forgetPass'} className="font-medium text-base text-violet-500">
+                        Quên Mật khẩu
+                    </Link>
                 </div>
                 <div className="mt-8 flex flex-col gap-y-4">
                     <button className="active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01]  ease-in-out transform py-4 bg-violet-500 rounded-xl text-white font-bold text-lg">
