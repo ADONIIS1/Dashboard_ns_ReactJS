@@ -4,10 +4,18 @@ import { MdOutlineCancel } from 'react-icons/md';
 import Button from './Button';
 import { userProfileData } from '../data/dummy';
 import { useStateContext } from '../contexts/ContextProvider';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
+    
     const { currentColor } = useStateContext();
+    const navigate = useNavigate();
 
+    const handleLogout = () => {
+        console.log('Check');
+        localStorage.removeItem("token");
+        navigate('/login')
+    }
     return (
         <div className="nav-item absolute right-1 top-16 bg-white dark:bg-[#42464D] p-8 rounded-lg w-96">
             <div className="flex justify-between items-center">
@@ -45,7 +53,10 @@ const UserProfile = () => {
                 ))}
             </div>
             <div className="mt-5">
-                <Button color="white" bgColor={currentColor} text="Logout" borderRadius="10px" width="full" />
+            <div onClick={handleLogout}>
+                <Button color="white" bgColor={currentColor} text="Logout" borderRadius="10px" width="full" z/>
+            </div>
+                
             </div>
         </div>
     );

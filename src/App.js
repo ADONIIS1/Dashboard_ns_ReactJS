@@ -2,6 +2,9 @@ import { Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from '~/routes';
 import DefaultLayout from '~/layouts';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { RequireAuth } from './contexts/RequireAuth';
 
 function App() {
     return (
@@ -11,7 +14,7 @@ function App() {
                     {publicRoutes.map((route, index) => {
                         const Page = route.component;
                         let Layout = DefaultLayout;
-
+                        console.log('check Page',route.path);// route.path
                         if (route.layout) {
                             Layout = route.layout;
                         } else if (route.layout === null) {
@@ -23,9 +26,16 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    <Layout>
-                                        <Page />
-                                    </Layout>
+                                    (route.path !== '/login') ?
+                                    <RequireAuth>
+                                        <Layout >
+                                            <Page />
+                                        </Layout>
+                                    </RequireAuth>
+                                    :
+                                        <Layout >
+                                            <Page />
+                                        </Layout>
                                 }
                             />
                         );
