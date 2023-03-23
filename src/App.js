@@ -14,7 +14,7 @@ function App() {
                     {publicRoutes.map((route, index) => {
                         const Page = route.component;
                         let Layout = DefaultLayout;
-                        console.log('check Page',route.path);// route.path
+                        //console.log('check Page',route.path);// route.path
                         if (route.layout) {
                             Layout = route.layout;
                         } else if (route.layout === null) {
@@ -26,16 +26,17 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    (route.path !== '/login') ?
+                                    (route.path == '/login' || route.path == '/' ) ?
+                                        <Layout >
+                                            <Page />
+                                        </Layout>
+                                    :
                                     <RequireAuth>
                                         <Layout >
                                             <Page />
                                         </Layout>
                                     </RequireAuth>
-                                    :
-                                        <Layout >
-                                            <Page />
-                                        </Layout>
+
                                 }
                             />
                         );

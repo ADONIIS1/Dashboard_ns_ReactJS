@@ -2,7 +2,7 @@ import * as React from 'react';
 // import { BrowserRouter, Routes, Route } from 'react-router-dom';
 // import ForgotPass from './ForgotPass';
 import {useNavigate} from 'react-router-dom'
-import {login} from '~/services/auth'
+import authService from '~/services/auth'
 import {useState} from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
@@ -21,9 +21,7 @@ import { Link } from 'react-router-dom';
     const handleSubmit = async (event) =>{
         try {
             event.preventDefault();
-            const data = await login(userInfo).then(res => {
-                console.log('Check data : ',res);
-                
+            const data = await authService.login(userInfo).then(res => {
                 return res;
             }).catch((err) => {
                 //console.log('Check data : ',err);
@@ -33,14 +31,12 @@ import { Link } from 'react-router-dom';
                 toast.warning(`${data.data.message}`, {
                     position: toast.POSITION.TOP_RIGHT
                 });
-                console.log('Data : ',data);
                 return;
             }
             if(data.status === 404){
                 toast.warning(`${data.data.message}`, {
                     position: toast.POSITION.TOP_RIGHT
                 });
-                console.log('Data : ',data);
                 return;
             }
             if(data.status === 401){
@@ -50,13 +46,12 @@ import { Link } from 'react-router-dom';
                 return;
             }
             if(data.status === 200){
-                console.log('Data Token : ',data.data.token);
                 localStorage.setItem('token',data.data.token);
+                localStorage.setItem('refreshtoken',data.data.refreshtoken);
                 navigate('/ecommerce')
             }
         } catch (error) {
             console.log(error);
-            
         }
         
 

@@ -1,17 +1,22 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import authService from '~/services/auth'
+ 
 
 function ECommerce() {
-    const navigate = useNavigate();
+    
+    // const data = async () => {
 
-    useEffect(()=>{
-        if(!localStorage.getItem('token')){
-            console.log('22222');
-            navigate('/login')
-        }
-          
-    },)
+    //     try {
+    //         const check = await authService.testAuthen();
+
+    //         return check;
+    //     } catch (error) {
+            
+    //     }
+
+    // }
+    // console.log('Check Token Err or Succ',data.data);
     return <h2>ECommerce page</h2>;
 }
 

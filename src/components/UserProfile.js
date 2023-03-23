@@ -14,6 +14,7 @@ const UserProfile = () => {
     const handleLogout = () => {
         console.log('Check');
         localStorage.removeItem("token");
+        localStorage.removeItem("refreshtoken");
         navigate('/login')
     }
     return (
