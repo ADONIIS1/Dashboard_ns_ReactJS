@@ -17,6 +17,171 @@ export const gridOrderImage = (props) => (
     </div>
 );
 
+export const links = [
+    {
+        title: 'Dashboard',
+        links: [
+            {
+                name: 'ecommerce',
+                icon: <FiShoppingBag />,
+            },
+        ],
+    },
+
+    {
+        title: 'Pages',
+        links: [
+            // {
+            //     name: 'orders',
+            //     icon: <AiOutlineShoppingCart />,
+            // },
+            // {
+            //     name: 'employees',
+            //     icon: <IoMdContacts />,
+            // },
+            // {
+            //     name: 'customers',
+            //     icon: <RiContactsLine />,
+            // },
+            {
+                name: 'information',
+                icon: <RiContactsLine />,
+            },
+        ],
+    },
+    
+
+    {
+        title: 'blog',
+        links: [
+            {
+                name: 'blog',
+                icon: <AiOutlineCalendar />,
+            },
+            {
+                name: 'blogManager',
+                icon: <BsKanban />,
+            },
+        ],
+    },
+
+    {
+        title: 'degree',
+        links: [
+            {
+                name: 'degreeManager',
+                icon: <BsKanban />,
+            },
+        ],
+    },
+    {
+        title: 'department',
+        links: [
+            {
+                name: 'departmentManager',
+                icon: <BsKanban />,
+            },
+        ],
+    },
+    {
+        title: 'permission',
+        links: [
+            {
+                name: 'permissionManager',
+                icon: <BsKanban />,
+            },
+        ],
+    },
+    {
+        title: 'Role',
+        links: [
+            {
+                name: 'RoleManager',
+                icon: <BsKanban />,
+            },
+        ],
+    },
+
+    {
+        title: 'salary',
+        links: [
+            {
+                name: 'salarymanager',
+                icon: <BsKanban />,
+            },
+            {
+                name: 'salary',
+                icon: <BsKanban />,
+            },
+        ],
+    },
+    {
+        title: 'user',
+        links: [
+            {
+                name: 'usermanager',
+                icon: <BsKanban />,
+            },
+        ],
+    },
+
+    {
+        title: 'Apps',
+        links: [
+            {
+                name: 'calendar',
+                icon: <AiOutlineCalendar />,
+            },
+            {
+                name: 'kanban',
+                icon: <BsKanban />,
+            },
+            {
+                name: 'editor',
+                icon: <FiEdit />,
+            },
+            {
+                name: 'color-picker',
+                icon: <BiColorFill />,
+            },
+        ],
+    },
+    {
+        title: 'Charts',
+        links: [
+            {
+                name: 'line',
+                icon: <AiOutlineStock />,
+            },
+            {
+                name: 'area',
+                icon: <AiOutlineAreaChart />,
+            },
+
+            {
+                name: 'bar',
+                icon: <AiOutlineBarChart />,
+            },
+            {
+                name: 'pie',
+                icon: <FiPieChart />,
+            },
+            {
+                name: 'financial',
+                icon: <RiStockLine />,
+            },
+            {
+                name: 'color-mapping',
+                icon: <BsBarChart />,
+            },
+            {
+                name: 'pyramid',
+                icon: <GiLouvrePyramid />,
+            },
+        ],
+    },
+];
+
 export const gridOrderStatus = (props) => (
     <button type="button" style={{ background: props.StatusBg }} className="text-white py-1 px-2 capitalize rounded-2xl text-md">
         {props.Status}
@@ -358,90 +523,6 @@ export const employeesGrid = [
     { field: 'EmployeeID', headerText: 'Employee ID', width: '125', textAlign: 'Center' },
 ];
 
-export const links = [
-    {
-        title: 'Dashboard',
-        links: [
-            {
-                name: 'ecommerce',
-                icon: <FiShoppingBag />,
-            },
-        ],
-    },
-
-    {
-        title: 'Pages',
-        links: [
-            {
-                name: 'orders',
-                icon: <AiOutlineShoppingCart />,
-            },
-            {
-                name: 'employees',
-                icon: <IoMdContacts />,
-            },
-            {
-                name: 'customers',
-                icon: <RiContactsLine />,
-            },
-        ],
-    },
-    {
-        title: 'Apps',
-        links: [
-            {
-                name: 'calendar',
-                icon: <AiOutlineCalendar />,
-            },
-            {
-                name: 'kanban',
-                icon: <BsKanban />,
-            },
-            {
-                name: 'editor',
-                icon: <FiEdit />,
-            },
-            {
-                name: 'color-picker',
-                icon: <BiColorFill />,
-            },
-        ],
-    },
-    {
-        title: 'Charts',
-        links: [
-            {
-                name: 'line',
-                icon: <AiOutlineStock />,
-            },
-            {
-                name: 'area',
-                icon: <AiOutlineAreaChart />,
-            },
-
-            {
-                name: 'bar',
-                icon: <AiOutlineBarChart />,
-            },
-            {
-                name: 'pie',
-                icon: <FiPieChart />,
-            },
-            {
-                name: 'financial',
-                icon: <RiStockLine />,
-            },
-            {
-                name: 'color-mapping',
-                icon: <BsBarChart />,
-            },
-            {
-                name: 'pyramid',
-                icon: <GiLouvrePyramid />,
-            },
-        ],
-    },
-];
 
 export const cartData = [
     {
