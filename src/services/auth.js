@@ -103,11 +103,6 @@ class authService{
             .catch( (err) => {
                console.log(err);
                return false;
-               // if(err.response.status == 401)
-               // {
-               //    await this.refreshtoken(localStorage.getItem('refreshtoken'));
-               //    await this.checkAuth(localStorage.getItem('token'));
-               // }
             });
             return checkAuth;
    }

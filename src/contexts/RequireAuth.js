@@ -12,28 +12,35 @@ export const RequireAuth =  ({children}) => {
         checkAuth(token).then(res => {
             setAuth(res)
         })
+        if(!auth){
+            return <Navigate to="/login" />
+        }
     },[])
-
 
     if(!auth){ // lỗi
         console.log('Checkkkk');
+        return <Navigate to="/login" />
+        
+        //return <Navigate to="/login" replace />
+    }
+    else{
         const refreshtoken = localStorage.getItem('refreshtoken')
-        if(refreshtoken){
-            let refresh = async (reff) => {
-                return await authService.refreshtoken(reff);
-            }
-            let data;
-            refresh(refreshtoken).then(res => {
-                data = res;
-                console.log(res);
-            })
-            if(data.status == 200){
-                localStorage.setItem('token',data.data.token)
-                localStorage.setItem('refreshtoken',data.data.refreshtoken)
-                return children;
-            }
+        if(!refreshtoken){
+            return <Navigate to="/login" />
         }
-        return <Navigate to="/login" replace />
+        let refresh = async (reff) => {
+            return await authService.refreshtoken(reff);
+        }
+        let data;
+        refresh(refreshtoken).then(res => {
+            data = res;
+        })
+        console.log('Check data : ',data);
+        if(data.status == 200){
+            localStorage.setItem('token',data.data.token)
+            localStorage.setItem('refreshtoken',data.data.refreshtoken)
+            return children;
+        }
     }
     return children;
 
