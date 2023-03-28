@@ -2,6 +2,9 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 function Modal({ isOpen, onClose, title, children }) {
+
+  
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -38,7 +41,11 @@ function Modal({ isOpen, onClose, title, children }) {
               <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                 {title}
               </Dialog.Title>
-              <div className="mt-2">{children}</div>
+              <div className="mt-2">
+
+                  {children}
+                  
+              </div>
             </div>
           </Transition.Child>
         </div>

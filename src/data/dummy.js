@@ -62,6 +62,10 @@ export const links = [
                 name: 'blogManager',
                 icon: <BsKanban />,
             },
+            {
+                name: 'test',
+                icon: <BsKanban />,
+            },
         ],
     },
 
