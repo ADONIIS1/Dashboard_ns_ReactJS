@@ -14,6 +14,9 @@ const routes = {
     salarymanager: '/salarymanager',
     salary: '/salary',
     usermanager: '/usermanager',
+    test: '/test',
+    schedule: '/schedule',
+
 };
 
 export default routes;
