@@ -3,9 +3,10 @@ import * as React from 'react';
 // import ForgotPass from './ForgotPass';
 import {useNavigate} from 'react-router-dom'
 import authService from '~/services/auth'
-import {useState} from 'react'
+import {useState,useContext} from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import {AuthContext} from "~/contexts/AuthContext";
 
  function Login() {
 
@@ -46,6 +47,7 @@ import { Link } from 'react-router-dom';
                 return;
             }
             if(data.status === 200){
+                console.log('Nể luôn : ',data.data);
                 localStorage.setItem('token',data.data.token);
                 localStorage.setItem('refreshtoken',data.data.refreshtoken);
                 navigate('/ecommerce')
@@ -53,8 +55,6 @@ import { Link } from 'react-router-dom';
         } catch (error) {
             console.log(error);
         }
-        
-
     }
 
     return (

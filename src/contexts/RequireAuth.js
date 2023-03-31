@@ -1,47 +1,49 @@
-import { checkChildNodeInContainer } from "@syncfusion/ej2/diagrams"
 import { useEffect, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import authService from '~/services/auth'
 export const RequireAuth =  ({children}) => {
     let token = localStorage.getItem('token')
-    let [auth,setAuth] = useState(true);
-    let checkAuth = async (tokentest) => {
-        return await authService.checkAuth(tokentest);
-    }
+    const [auth,setAuth] = useState(true); 
     useEffect(() => {
-        checkAuth(token).then(res => {
-            setAuth(res)
-        })
-        if(!auth){
-            return <Navigate to="/login" />
+        const checkAuth = async (accessToken = '') => {
+            await authService.checkAuth(accessToken).then(res => {
+                console.log('Check Auth',res);
+                setAuth(res)
+            }).catch(err => {
+                setAuth(false)
+            })
         }
+        console.log(checkAuth(token));
     },[])
-
-    if(!auth){ // lỗi
+    if(!token){ // lỗi
         console.log('Checkkkk');
         return <Navigate to="/login" />
-        
-        //return <Navigate to="/login" replace />
     }
-    else{
-        const refreshtoken = localStorage.getItem('refreshtoken')
-        if(!refreshtoken){
-            return <Navigate to="/login" />
+    else
+    {
+        if(!auth){
+            const refreshtoken = localStorage.getItem('refreshtoken')
+
+            if(!refreshtoken ){
+                return <Navigate to="/login" />
+            }
+            const refresh = async (reff) => {
+                return await authService.refreshtoken(reff).then(p => p)
+            }
+            console.log('Check');
+            const checkRefreshTokenExpiresIn = refresh(refreshtoken).then(value => {
+                if(value.status === 200){
+                    console.log('Check');
+                    localStorage.setItem('token',value.data.token)
+                    localStorage.setItem('refreshtoken',value.data.refreshtoken)
+                }
+            })
+            if(!checkRefreshTokenExpiresIn){
+                return <Navigate to="/login" />
+            }
         }
-        let refresh = async (reff) => {
-            return await authService.refreshtoken(reff);
-        }
-        let data;
-        refresh(refreshtoken).then(res => {
-            data = res;
-        })
-        console.log('Check data : ',data);
-        if(data.status == 200){
-            localStorage.setItem('token',data.data.token)
-            localStorage.setItem('refreshtoken',data.data.refreshtoken)
-            return children;
-        }
+        return children;
     }
-    return children;
+    
 
 }

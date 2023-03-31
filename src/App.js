@@ -2,10 +2,8 @@ import { Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from '~/routes';
 import DefaultLayout from '~/layouts';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RequireAuth } from './contexts/RequireAuth';
-
 function App() {
     return (
         <BrowserRouter>
@@ -31,12 +29,12 @@ function App() {
                                             <Page />
                                         </Layout>
                                     :
-                                    <RequireAuth>
-                                        <Layout >
-                                            <Page />
-                                        </Layout>
-                                    </RequireAuth>
 
+                                        <RequireAuth>
+                                            <Layout >
+                                                <Page />
+                                            </Layout>
+                                        </RequireAuth>
                                 }
                             />
                         );
