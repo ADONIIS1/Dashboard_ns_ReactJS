@@ -91,7 +91,7 @@ const SalaryManager = () => {
   const handleSubmit = async (event,_id) => {
     event.preventDefault();
     
-    if(_id == undefined){
+    if(_id === undefined){
       setSalary(salary);
       await salaryService.create(salary).then(res => {
         return res;

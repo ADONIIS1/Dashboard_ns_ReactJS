@@ -87,9 +87,9 @@ const Degree = () => {
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
 
-        if (_id == undefined) {
+        if (_id === undefined) {
             setDegree(degree);
-            const data = await degreeService
+            await degreeService
                 .create(degree)
                 .then((res) => {
                     return res;

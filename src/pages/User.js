@@ -158,7 +158,7 @@ const UserManager = () => {
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
 
-        if (_id == undefined) {
+        if (_id === undefined) {
             setUser(user);
             await userService
                 .create(user)

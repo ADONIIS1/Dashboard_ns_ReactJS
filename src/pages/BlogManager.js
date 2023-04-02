@@ -87,9 +87,9 @@ const BlogManager = () => {
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
 
-        if (_id == undefined) {
+        if (_id === undefined) {
             setBlog(blog);
-            const data = await blogService
+            await blogService
                 .create(blog)
                 .then((res) => {
                     return res;

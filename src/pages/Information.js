@@ -1,5 +1,4 @@
-import { ICONS } from '@syncfusion/ej2/filemanager';
-import { ColorValue } from '@syncfusion/ej2/maps';
+
 import React, { useState } from 'react';
 
 function Information() {
