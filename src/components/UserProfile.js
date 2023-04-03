@@ -15,6 +15,7 @@ const UserProfile = () => {
         console.log('Check');
         localStorage.removeItem("token");
         localStorage.removeItem("refreshtoken");
+        localStorage.removeItem("roles");
         navigate('/login')
     }
     return (

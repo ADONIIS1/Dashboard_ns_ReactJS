@@ -22,23 +22,21 @@ import Test from '~/pages/Test';
 import Schedule from '~/pages/Sched';
 // Public routes
 const publicRoutes = [
-    { path: config.routes.home, component: Login , layout: LoginLayout },
+    { path: config.routes.home, component: Login, layout: LoginLayout },
     //{ path: config.routes.home, component: UserProfile },
-    { path: config.routes.ecommerce, component: ECommerce },
-    { path: config.routes.information, component: Information },
-    { path: config.routes.blogmanager, component: BlogManager },
-    { path: config.routes.blog, component: Blog },
-    { path: config.routes.degreemanager, component: Degree },
-    { path: config.routes.departmentmanager, component: Department },
-    { path: config.routes.permissionmanager, component: Permission },
-    { path: config.routes.rolemanager, component: Role },
-    { path: config.routes.salarymanager, component: SalaryManager },
-    { path: config.routes.usermanager, component: User },
-    { path: config.routes.salary, component: Salary },
-    { path: config.routes.test, component: Test },
-    { path: config.routes.schedule, component: Schedule },
-
-
+    { path: config.routes.ecommerce, component: ECommerce, auth: ['Blog.VIEW'] },
+    { path: config.routes.information, component: Information, auth: ['Blog.VIEW', 'zxmczxc'] },
+    { path: config.routes.blogmanager, component: BlogManager, auth: ['Blog.VIEW', 'zxmczxc'] },
+    { path: config.routes.blog, component: Blog, auth: ['Blog.VIEW', 'zxmczxc'] },
+    { path: config.routes.degreemanager, component: Degree, auth: ['Blog.VIEW'] },
+    { path: config.routes.departmentmanager, component: Department, auth: ['Blog.VIEW'] },
+    { path: config.routes.permissionmanager, component: Permission, auth: ['Blog.VIEW'] },
+    { path: config.routes.rolemanager, component: Role, auth: ['Blog.VIEW'] },
+    { path: config.routes.salarymanager, component: SalaryManager, auth: ['Blog.VIEW'] },
+    { path: config.routes.usermanager, component: User, auth: ['Blog.VIEW'] },
+    { path: config.routes.salary, component: Salary, auth: ['Blog.VIEW'] },
+    { path: config.routes.test, component: Test, auth: ['Blog.VIEW'] },
+    { path: config.routes.schedule, component: Schedule, auth: ['Blog.VIEW'] },
 
     { path: config.routes.login, component: Login, layout: LoginLayout },
     { path: config.routes.forgetPass, component: ForgotPass, layout: LoginLayout },
@@ -47,3 +45,5 @@ const publicRoutes = [
 const privateRoutes = [];
 
 export { publicRoutes, privateRoutes };
+
+// 'kế toán' info

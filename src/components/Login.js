@@ -6,7 +6,7 @@ import authService from '~/services/auth'
 import {useState,useContext} from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import {AuthContext} from "~/contexts/AuthContext";
+import jwt_decode from "jwt-decode";
 
  function Login() {
 
@@ -47,7 +47,8 @@ import {AuthContext} from "~/contexts/AuthContext";
                 return;
             }
             if(data.status === 200){
-                console.log('Nể luôn : ',data.data);
+                const decoded = jwt_decode(data.data.token); // decode Token
+                localStorage.setItem('roles',decoded.roles)
                 localStorage.setItem('token',data.data.token);
                 localStorage.setItem('refreshtoken',data.data.refreshtoken);
                 navigate('/ecommerce')

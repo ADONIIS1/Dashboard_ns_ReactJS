@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from '~/routes';
 import DefaultLayout from '~/layouts';
 import 'react-toastify/dist/ReactToastify.css';
-import { RequireAuth } from './contexts/RequireAuth';
+import { RequireAuthentication } from './contexts/ProtectedAuthentication';
+import { RequireAuthorization } from './contexts/ProtectedAuthortication';
+
 function App() {
     return (
         <BrowserRouter>
@@ -29,12 +31,15 @@ function App() {
                                             <Page />
                                         </Layout>
                                     :
-
-                                        <RequireAuth>
-                                            <Layout >
-                                                <Page />
-                                            </Layout>
-                                        </RequireAuth>
+                                        <RequireAuthentication 
+                                            children=
+                                            {<RequireAuthorization 
+                                                children={
+                                                    <Layout >
+                                                        <Page />
+                                                    </Layout>
+                                                } roles={route.auth}/>
+                                            } />
                                 }
                             />
                         );
