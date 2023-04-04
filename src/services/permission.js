@@ -5,9 +5,10 @@ class permissionService {
         // formBody {Object}
         try {
             const res = await request
-                .get('role/permission/getAll', JSON.stringify(req), {
+                .get('role/getAllPermission', JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
 

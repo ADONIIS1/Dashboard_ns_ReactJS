@@ -26,20 +26,24 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    (route.path == '/login' || route.path == '/' ) ?
-                                        <Layout >
+                                    route.path == '/login' || route.path == '/' ? (
+                                        <Layout>
                                             <Page />
                                         </Layout>
-                                    :
-                                        <RequireAuthentication 
-                                            children=
-                                            {<RequireAuthorization 
-                                                children={
-                                                    <Layout >
-                                                        <Page />
-                                                    </Layout>
-                                                } roles={route.auth}/>
-                                            } />
+                                    ) : (
+                                        <RequireAuthentication
+                                            children={
+                                                <RequireAuthorization
+                                                    children={
+                                                        <Layout>
+                                                            <Page />
+                                                        </Layout>
+                                                    }
+                                                    roles={route.auth}
+                                                />
+                                            }
+                                        />
+                                    )
                                 }
                             />
                         );

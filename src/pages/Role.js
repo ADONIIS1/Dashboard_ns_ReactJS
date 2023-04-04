@@ -8,7 +8,6 @@ import permissionService from '~/services/permission';
 import { useNavigate } from 'react-router-dom';
 
 const Role = () => {
-    const navigate = useNavigate();
     // useState modal
     const [isOpen, setIsOpen] = useState(false);
     const [roles, setRoles] = useState([]);

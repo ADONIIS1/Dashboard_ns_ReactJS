@@ -1,7 +1,6 @@
-import { useEffect,useState,useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import authService from '~/services/auth'
- 
+import { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import authService from '~/services/auth';
 
 function ECommerce() {
     // const data = async () => {
@@ -11,7 +10,7 @@ function ECommerce() {
 
     //         return check;
     //     } catch (error) {
-            
+
     //     }
 
     // }
