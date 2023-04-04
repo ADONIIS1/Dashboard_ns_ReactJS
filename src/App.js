@@ -2,9 +2,9 @@ import { Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from '~/routes';
 import DefaultLayout from '~/layouts';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { RequireAuth } from './contexts/RequireAuth';
+import { RequireAuthentication } from './contexts/ProtectedAuthentication';
+import { RequireAuthorization } from './contexts/ProtectedAuthortication';
 
 function App() {
     return (
@@ -26,17 +26,24 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    (route.path == '/login' || route.path == '/' ) ?
-                                        <Layout >
+                                    route.path == '/login' || route.path == '/' ? (
+                                        <Layout>
                                             <Page />
                                         </Layout>
-                                    :
-                                    <RequireAuth>
-                                        <Layout >
-                                            <Page />
-                                        </Layout>
-                                    </RequireAuth>
-
+                                    ) : (
+                                        <RequireAuthentication
+                                            children={
+                                                <RequireAuthorization
+                                                    children={
+                                                        <Layout>
+                                                            <Page />
+                                                        </Layout>
+                                                    }
+                                                    roles={route.auth}
+                                                />
+                                            }
+                                        />
+                                    )
                                 }
                             />
                         );

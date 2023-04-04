@@ -1,189 +1,158 @@
 import React from 'react';
 import { HiPencilAlt, HiTrash } from 'react-icons/hi';
 import { useState } from 'react';
-import { useEffect} from 'react';
-import Modal from "../components/Modal";
-import departmentService from '~/services/department';
+import { useEffect } from 'react';
+import Modal from '../components/Modal';
+import roleService from '~/services/role';
+import permissionService from '~/services/permission';
+import { useNavigate } from 'react-router-dom';
 
-const Department = () => {
-
-  // useState modal
-  const [isOpen, setIsOpen] = useState(false);
-
-  const openModal = () => {
-    setIsOpen(true);
-    setDepartment({
-      name : "",
-      address : "",
-      phone : "",
+const Role = () => {
+    // useState modal
+    const [isOpen, setIsOpen] = useState(false);
+    const [roles, setRoles] = useState([]);
+    const [permissions, setPermissions] = useState([]);
+    const [roleDetail, setRoleDetail] = useState([]);
+    const [roleNameDetail, setRoleNameDetail] = useState({
+        roleId: '',
+        roleName: '',
     });
-  };
-
-  const closeModal = () => {
-    setIsOpen(false);
-  };
-
-
-  // sort
-  const [sorting, setSorting] = useState({ criteria: null, direction: 'asc' });
-
-  const getSortingFunction = (criteria, direction) => {
-    const directionModifier = direction === 'asc' ? 1 : -1;
-    return (a, b) => {
-      if (a[criteria] < b[criteria]) {
-        return -1 * directionModifier;
-      }
-      if (a[criteria] > b[criteria]) {
-        return 1 * directionModifier;
-      }
-      return 0;
+    const openModal = () => {
+        setIsOpen(true);
     };
-  };
+    useEffect(() => {
+        permissionService.getAll().then((res) => {
+            setPermissions(res.data);
+        });
+        roleService.getAll().then((res) => {
+            setRoles(res.data);
+        });
+    }, []);
+    const closeModal = () => {
+        setIsOpen(false);
+    };
 
-  // data
-  const [jsonData, setJsonData] = useState([]);
+    // data
+    const handleEdit = (roleId, roleName) => {
+        roleService.getById(roleId).then((res) => {
+            setRoleDetail(res.data.permissions);
+        });
+        setRoleNameDetail({
+            roleId: roleId,
+            roleName: roleName,
+        });
+        if (roleId !== null) {
+            openModal();
+        }
+    };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        roleService.addPermissiontoRole({ id: roleNameDetail.roleId, permissions: roleDetail }).then((res) => {
+            console.log(res);
+        });
+        closeModal();
+    };
 
-  useEffect(() => {
-    departmentService.getDepartment({})
-      .then(response => {
-        setJsonData(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }, []);
+    function handleChecked(event) {
+        let check = event.target.checked;
+        let check_id = event.target.value;
+        if (check) {
+            setRoleDetail((items) => [...items, check_id]);
+        } else {
+            let data = roleDetail.filter((item) => item !== check_id);
+            setRoleDetail(data);
+        }
 
-  const handleEdit = (id,name,address, phone) => {
-    if(id !== null){
-      openModal()
-      handleChange(id,name,address, phone)
+        // console.log(data);
     }
-  };
+    return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-4">Roles</h1>
+            <div className="mt-8 flex justify-end">
+                <button className="bg-blue-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded" onClick={openModal}>
+                    +
+                </button>
+            </div>
+            <div className="w-full overflow-x-auto" style={{ paddingTop: '20px' }}>
+                <table className="w-full table-auto">
+                    <thead>
+                        <tr>
+                            <th className="px-4 py-2">Name Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {roles.map((item, index) => (
+                            <tr key={index} className={'bg-gray-100'}>
+                                <td className="border px-4 py-2">{item.name}</td>
+                                <td className="border px-4 py-2">
+                                    <div className="flex space-x-2">
+                                        <button className="text-blue-600 hover:text-blue-800">
+                                            <HiPencilAlt size={20} onClick={() => handleEdit(item._id, item.name)} />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-  const handleDelete = (e) => {
-
-  };
-
-
-  const [department,setDepartment] = useState({
-      name : "",
-      address : "",
-      phone : "",
-  });
-
-  
-
-  const handleChange = (id,name,address, phone) => {
-    setDepartment({
-      name : name,
-      address : address,
-      phone : phone,
-    });
-    
-  };
-  
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-4">Department Posts</h1>
-      <div className="mt-8 flex justify-end">
-        <button className="bg-blue-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded" onClick={openModal}>
-          +
-        </button>
-      </div>
-      <div className="w-full overflow-x-auto" style={{ paddingTop: '20px' }}>
-        <table className="w-full table-auto">
-          <thead>
-            <tr>
-              <th className="px-4 py-2" onClick={() => setSorting({ criteria: 'name', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}>Name</th>
-              <th className="px-4 py-2" onClick={() => setSorting({ criteria: 'address', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}>Adress</th>
-              <th className="px-4 py-2" onClick={() => setSorting({ criteria: 'phone', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}>Phone</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {jsonData.sort(getSortingFunction(sorting.criteria, sorting.direction)).map((post, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
-                <td className="border px-4 py-2">{post.name}</td>
-                <td className="border px-4 py-2">{post.address}</td>
-                <td className="border px-4 py-2">{post.phone}</td>
-                <td className="border px-4 py-2">
-                  <div className="flex space-x-2">
-                    <button className="text-blue-600 hover:text-blue-800"><HiPencilAlt size={20} onClick={() => handleEdit(post._id, post.name, post.address, post.phone,)}/></button>
-                    <button className="text-red-600 hover:text-red-800"><HiTrash size={20} /></button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      
-    <>
-      <Modal isOpen={isOpen} onClose={closeModal} title="My Modal">
-      <button
-        className="absolute top-0 right-0 mt-4 mr-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:shadow-outline"
-        onClick={closeModal}
-      >
-        <svg
-          className="h-6 w-6 fill-current"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fillRule="evenodd"
-            d="M18.293 3.293a1 1 0 00-1.414 0L10 8.586 4.707 3.293a1 1 0 10-1.414 1.414L8.586 10l-5.293 5.293a1 1 0 001.414 1.414L10 11.414l5.293 5.293a1 1 0 001.414-1.414L11.414 10l5.879-5.879a1 1 0 000-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </button>
-
-          <div className="mb-4">
-        <label htmlFor="title" className="block text-gray-700 font-bold mb-2">
-          Name
-        </label>
-        <input 
-          type="text"
-          id="name"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          value={department.name}
-          onChange={handleChange}
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="content" className="block text-gray-700 font-bold mb-2">
-          Adress
-        </label>
-        <textarea
-          id="address"
-          value={department.address}
-          onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        ></textarea>
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="image" className="block text-gray-700 font-bold mb-2">
-          Phone
-        </label>
-        <input
-          type="text"
-          id="phone"
-          value={department.phone}
-          onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
-
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-        Lưu
-      </button>
-      </Modal>
-      
-    </>
-    </div>
-  );
+            <>
+                <Modal isOpen={isOpen} onClose={closeModal} title={`Phân quyền cho ${roleNameDetail.roleName}`}>
+                    <button
+                        className="absolute top-0 right-0 mt-4 mr-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:shadow-outline"
+                        onClick={closeModal}
+                    >
+                        <svg className="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path
+                                fillRule="evenodd"
+                                d="M18.293 3.293a1 1 0 00-1.414 0L10 8.586 4.707 3.293a1 1 0 10-1.414 1.414L8.586 10l-5.293 5.293a1 1 0 001.414 1.414L10 11.414l5.293 5.293a1 1 0 001.414-1.414L11.414 10l5.879-5.879a1 1 0 000-1.414z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                    </button>
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-4" style={{ width: '400px' }}>
+                            {permissions.map((item, index) => (
+                                <tr key={index} className={'bg-gray-100'} style={{ width: '400px' }}>
+                                    {item.name.includes('.') ? (
+                                        <div
+                                            style={{
+                                                width: '200px',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                placeItems: 'flex-end',
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            <td className="px-4 py-2">{item.display}</td>
+                                            <td>
+                                                <input
+                                                    style={{ width: '20px' }}
+                                                    type="checkbox"
+                                                    value={item._id}
+                                                    checked={roleDetail.includes(item._id) ? true : false}
+                                                    onChange={handleChecked}
+                                                />
+                                            </td>
+                                        </div>
+                                    ) : (
+                                        <div style={{ width: '200px' }}>
+                                            <td className="px-4 py-2" style={{ color: 'red' }}>
+                                                {item.display}
+                                            </td>
+                                        </div>
+                                    )}
+                                </tr>
+                            ))}
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Lưu
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
+            </>
+        </div>
+    );
 };
-export default Department;
-
-
+export default Role;
