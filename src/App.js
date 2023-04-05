@@ -26,7 +26,7 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    route.path == '/login' || route.path == '/' ? (
+                                    route.path === '/login' || route.path === '/' ? (
                                         <Layout>
                                             <Page />
                                         </Layout>

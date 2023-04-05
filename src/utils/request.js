@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { Navigate } from 'react-router-dom';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8080',
-    //baseURL : 'http://localhost:3001'
+    // baseURL: 'http://localhost:8080',
+    baseURL: 'http://localhost:3001',
 });
 
 // instance.interceptors.request.use(

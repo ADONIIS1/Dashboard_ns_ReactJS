@@ -1,7 +1,7 @@
 const routes = {
     home: '/',
     ecommerce: '/ecommerce',
-    userprofile : '/userprofile',
+    userprofile: '/userprofile',
     login: '/login',
     forgetPass: '/forgetPass',
     information: '/information',
@@ -9,14 +9,12 @@ const routes = {
     blogmanager: '/blogmanager',
     degreemanager: '/degreemanager',
     departmentmanager: '/departmentmanager',
-    permissionmanager: '/permissionmanager',
     rolemanager: '/rolemanager',
     salarymanager: '/salarymanager',
-    salary: '/salary',
     usermanager: '/usermanager',
     test: '/test',
     schedule: '/schedule',
-
+    employee: '/employee/:id',
 };
 
 export default routes;
