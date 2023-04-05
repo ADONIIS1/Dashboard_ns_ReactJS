@@ -1,14 +1,11 @@
 import React from 'react';
-import { AiOutlineCalendar, AiOutlineShoppingCart, AiOutlineAreaChart, AiOutlineBarChart, AiOutlineStock } from 'react-icons/ai';
-import { FiShoppingBag, FiEdit, FiPieChart, FiBarChart, FiCreditCard, FiStar, FiShoppingCart } from 'react-icons/fi';
-import { BsKanban, BsBarChart, BsBoxSeam, BsCurrencyDollar, BsShield, BsChatLeft } from 'react-icons/bs';
-import { BiColorFill } from 'react-icons/bi';
-import { IoMdContacts } from 'react-icons/io';
-import { RiContactsLine, RiStockLine } from 'react-icons/ri';
+import { AiOutlineCalendar } from 'react-icons/ai';
+import { FiShoppingBag, FiBarChart, FiCreditCard, FiStar, FiShoppingCart } from 'react-icons/fi';
+import { BsKanban, BsBoxSeam, BsCurrencyDollar, BsShield, BsChatLeft } from 'react-icons/bs';
+import { RiContactsLine } from 'react-icons/ri';
 import { MdOutlineSupervisorAccount } from 'react-icons/md';
 import { HiOutlineRefresh } from 'react-icons/hi';
 import { TiTick } from 'react-icons/ti';
-import { GiLouvrePyramid } from 'react-icons/gi';
 import { GrLocation } from 'react-icons/gr';
 
 export const gridOrderImage = (props) => (
@@ -49,7 +46,6 @@ export const links = [
             },
         ],
     },
-    
 
     {
         title: 'blog',
@@ -87,15 +83,15 @@ export const links = [
             },
         ],
     },
-    {
-        title: 'permission',
-        links: [
-            {
-                name: 'permissionManager',
-                icon: <BsKanban />,
-            },
-        ],
-    },
+    // {
+    //     title: 'permission',
+    //     links: [
+    //         {
+    //             name: 'permissionManager',
+    //             icon: <BsKanban />,
+    //         },
+    //     ],
+    // },
     {
         title: 'Role',
         links: [
@@ -113,10 +109,6 @@ export const links = [
                 name: 'salarymanager',
                 icon: <BsKanban />,
             },
-            {
-                name: 'salary',
-                icon: <BsKanban />,
-            },
         ],
     },
     {
@@ -129,61 +121,61 @@ export const links = [
         ],
     },
 
-    {
-        title: 'Apps',
-        links: [
-            {
-                name: 'calendar',
-                icon: <AiOutlineCalendar />,
-            },
-            {
-                name: 'kanban',
-                icon: <BsKanban />,
-            },
-            {
-                name: 'editor',
-                icon: <FiEdit />,
-            },
-            {
-                name: 'color-picker',
-                icon: <BiColorFill />,
-            },
-        ],
-    },
-    {
-        title: 'Charts',
-        links: [
-            {
-                name: 'line',
-                icon: <AiOutlineStock />,
-            },
-            {
-                name: 'area',
-                icon: <AiOutlineAreaChart />,
-            },
+    // {
+    //     title: 'Apps',
+    //     links: [
+    //         {
+    //             name: 'calendar',
+    //             icon: <AiOutlineCalendar />,
+    //         },
+    //         {
+    //             name: 'kanban',
+    //             icon: <BsKanban />,
+    //         },
+    //         {
+    //             name: 'editor',
+    //             icon: <FiEdit />,
+    //         },
+    //         {
+    //             name: 'color-picker',
+    //             icon: <BiColorFill />,
+    //         },
+    //     ],
+    // },
+    // {
+    //     title: 'Charts',
+    //     links: [
+    //         {
+    //             name: 'line',
+    //             icon: <AiOutlineStock />,
+    //         },
+    //         {
+    //             name: 'area',
+    //             icon: <AiOutlineAreaChart />,
+    //         },
 
-            {
-                name: 'bar',
-                icon: <AiOutlineBarChart />,
-            },
-            {
-                name: 'pie',
-                icon: <FiPieChart />,
-            },
-            {
-                name: 'financial',
-                icon: <RiStockLine />,
-            },
-            {
-                name: 'color-mapping',
-                icon: <BsBarChart />,
-            },
-            {
-                name: 'pyramid',
-                icon: <GiLouvrePyramid />,
-            },
-        ],
-    },
+    //         {
+    //             name: 'bar',
+    //             icon: <AiOutlineBarChart />,
+    //         },
+    //         {
+    //             name: 'pie',
+    //             icon: <FiPieChart />,
+    //         },
+    //         {
+    //             name: 'financial',
+    //             icon: <RiStockLine />,
+    //         },
+    //         {
+    //             name: 'color-mapping',
+    //             icon: <BsBarChart />,
+    //         },
+    //         {
+    //             name: 'pyramid',
+    //             icon: <GiLouvrePyramid />,
+    //         },
+    //     ],
+    // },
 ];
 
 export const gridOrderStatus = (props) => (
@@ -526,7 +518,6 @@ export const employeesGrid = [
     { field: 'ReportsTo', headerText: 'Reports To', width: '120', textAlign: 'Center' },
     { field: 'EmployeeID', headerText: 'Employee ID', width: '125', textAlign: 'Center' },
 ];
-
 
 export const cartData = [
     {

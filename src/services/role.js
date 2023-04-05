@@ -1,6 +1,4 @@
-import { stringify } from 'postcss';
 import request from '~/utils/request';
-
 class roleService {
     getAll = async (req = {}) => {
         // formBody {Object}
@@ -9,6 +7,7 @@ class roleService {
                 .get('/role/getAll', JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
                 .then((res) => {
@@ -45,6 +44,7 @@ class roleService {
                 .post('/role/create', JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
 
@@ -81,6 +81,7 @@ class roleService {
                 .put(`/role/${_id}/update`, JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
 
@@ -117,6 +118,7 @@ class roleService {
                 .delete(`/role/${_id}/delete`, JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
 
@@ -153,6 +155,7 @@ class roleService {
                 .get(`/role/getById/${_id}`, {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
                 .then((res) => {
@@ -187,6 +190,7 @@ class roleService {
                 .post(`/role/addPermissionstoRole`, JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
                 .then((res) => {

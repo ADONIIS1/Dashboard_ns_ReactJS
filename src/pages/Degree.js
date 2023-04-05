@@ -4,15 +4,16 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import Modal from '../components/Modal';
 import degreeService from '~/services/degree';
-import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import DialogBox from '~/components/DialogBox';
+import validator from 'validator';
 
 const Degree = () => {
-    const navigate = useNavigate();
-    // useState modal
     const [isOpen, setIsOpen] = useState(false);
 
     const openModal = () => {
         setIsOpen(true);
+        setFormErrors({});
         setDegree({
             name: '',
             specialized: '',
@@ -55,8 +56,8 @@ const Degree = () => {
     }, []);
 
     const handleEdit = (id, name, specialized, majors) => {
+        setFormErrors({});
         if (id !== null) {
-            openModal();
             setDegree({
                 _id: id,
                 name: name,
@@ -64,10 +65,29 @@ const Degree = () => {
                 majors: majors,
             });
         }
+        setIsOpen(true);
     };
 
-    const handleDelete = (e) => {
-        navigate('/departmentManager');
+    const handleDelete = async (_id) => {
+        if (_id !== undefined) {
+            try {
+                await degreeService.delete(_id);
+                setJsonData((prevData) => prevData.filter((item) => item._id !== _id));
+            } catch (error) {
+                console.log(error);
+            }
+
+            toast.success('🦄 Delete degree success!', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'colored',
+            });
+        }
     };
 
     const [degree, setDegree] = useState({
@@ -82,42 +102,95 @@ const Degree = () => {
             ...prevState,
             [id]: value,
         }));
+        const errors = {};
+        if (validator.isEmpty(degree.name)) {
+            errors.name = 'This field is required';
+        }
+        if (validator.isEmpty(degree.specialized)) {
+            errors.specialized = 'This field is required';
+        }
+        if (validator.isEmpty(degree.majors)) {
+            errors.majors = 'This field is required';
+        }
+        setFormErrors(errors);
     };
 
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
-
-        if (_id === undefined) {
-            setDegree(degree);
-            await degreeService
-                .create(degree)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    return err;
-                });
-        } else {
-            setDegree(degree);
-            await degreeService
-                .update(_id, degree)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    return err;
-                });
+        setFormErrors({});
+        const errors = {};
+        if (validator.isEmpty(degree.name)) {
+            errors.name = 'This field is required';
         }
-        degreeService
-            .getAll({})
-            .then((response) => {
-                setJsonData(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        closeModal();
+        if (validator.isEmpty(degree.specialized)) {
+            errors.specialized = 'This field is required';
+        }
+        if (validator.isEmpty(degree.majors)) {
+            errors.majors = 'This field is required';
+        }
+        if (Object.keys(errors).length === 0) {
+            if (_id === undefined) {
+                setDegree(degree);
+                await degreeService
+                    .create(degree)
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((err) => {
+                        return err;
+                    });
+                toast.success('🦄 Add degree success!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored',
+                });
+            } else {
+                setDegree(degree);
+                await degreeService
+                    .update(_id, degree)
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((err) => {
+                        return err;
+                    });
+                toast.success('🦄 Edit degree success!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored',
+                });
+            }
+            degreeService
+                .getAll({})
+                .then((response) => {
+                    setJsonData(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            closeModal();
+        } else {
+            setFormErrors(errors);
+        }
     };
+
+    /// Modal confirm
+    const handleCancel = () => {
+        console.log('Cancel button clicked');
+    };
+
+    // validation
+    const [formErrors, setFormErrors] = useState('123');
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -163,9 +236,19 @@ const Degree = () => {
                                         <button className="text-blue-600 hover:text-blue-800">
                                             <HiPencilAlt size={20} onClick={() => handleEdit(post._id, post.name, post.specialized, post.majors)} />
                                         </button>
-                                        <button className="text-red-600 hover:text-red-800">
-                                            <HiTrash size={20} onClick={handleDelete} />
-                                        </button>
+                                        <DialogBox
+                                            buttonText={
+                                                <span className="text-red-600 cursor-pointer hover:text-red-800">
+                                                    <HiTrash size={20} />
+                                                </span>
+                                            }
+                                            headerText="Delete Degree"
+                                            bodyText="Are you sure of your action? This action cannot be undone"
+                                            cancelText="Cancel"
+                                            confirmText="Confirm"
+                                            onCancel={handleCancel}
+                                            onConfirm={() => handleDelete(post._id)}
+                                        />
                                     </div>
                                 </td>
                             </tr>
@@ -191,7 +274,7 @@ const Degree = () => {
                     <form onSubmit={(event) => handleSubmit(event, degree._id)}>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
-                                Tiêu đề
+                                Name
                             </label>
                             <input
                                 type="text"
@@ -199,39 +282,48 @@ const Degree = () => {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value={degree.name}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                             />
+                            {degree.name !== null && formErrors.name && <p className="text-red-500">{formErrors.name}</p>}
                         </div>
                         <div className="mb-4">
                             <label htmlFor="specialized" className="block text-gray-700 font-bold mb-2">
-                                Nội dung
+                                Specialized
                             </label>
                             <textarea
                                 id="specialized"
                                 value={degree.specialized}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             ></textarea>
+                            {degree.specialized !== null && formErrors.specialized && <p className="text-red-500">{formErrors.specialized}</p>}
                         </div>
 
                         <div className="mb-4">
                             <label htmlFor="majors" className="block text-gray-700 font-bold mb-2">
-                                Ảnh
+                                Majors
                             </label>
                             <input
                                 type="text"
                                 id="majors"
                                 value={degree.majors}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
+                            {degree.majors !== null && formErrors.majors && <p className="text-red-500">{formErrors.majors}</p>}
                         </div>
 
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Save
-                        </button>
+                        <div className="mb-4 float-right">
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Save
+                            </button>
+                        </div>
                     </form>
                 </Modal>
             </>
+            <ToastContainer />
         </div>
     );
 };

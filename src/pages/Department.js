@@ -4,7 +4,10 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import Modal from '../components/Modal';
 import departmentService from '~/services/department';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, generatePath } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import DialogBox from '~/components/DialogBox';
+import validator from 'validator';
 
 const BlogManager = () => {
     const navigate = useNavigate();
@@ -13,6 +16,7 @@ const BlogManager = () => {
 
     const openModal = () => {
         setIsOpen(true);
+        setFormErrors({});
         setDepartment({
             name: '',
             address: '',
@@ -26,6 +30,8 @@ const BlogManager = () => {
 
     // sort
     const [sorting, setSorting] = useState({ criteria: null, direction: 'asc' });
+
+    const [id, setId] = useState();
 
     const getSortingFunction = (criteria, direction) => {
         const directionModifier = direction === 'asc' ? 1 : -1;
@@ -55,19 +61,37 @@ const BlogManager = () => {
     }, []);
 
     const handleEdit = (id, name, address, phone) => {
-        if (id !== null) {
-            openModal();
+        setFormErrors({});
+        if (id !== undefined) {
             setDepartment({
                 _id: id,
                 name: name,
                 address: address,
                 phone: phone,
             });
+            setIsOpen(true);
         }
     };
 
-    const handleDelete = (e) => {
-        navigate('/departmentManager');
+    const handleDelete = async (_id) => {
+        if (_id !== undefined) {
+            try {
+                await departmentService.delete(_id);
+                setJsonData((prevData) => prevData.filter((item) => item._id !== _id));
+            } catch (error) {
+                console.log(error);
+            }
+            toast.success('🦄 Delete department success!', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'colored',
+            });
+        }
     };
 
     const handleButtonClick = (e) => {
@@ -86,42 +110,96 @@ const BlogManager = () => {
             ...prevState,
             [id]: value,
         }));
+        const errors = {};
+        if (validator.isEmpty(department.name)) {
+            errors.name = 'This field is required';
+        }
+        if (validator.isEmpty(department.address)) {
+            errors.address = 'This field is required';
+        }
+        if (validator.isEmpty(department.phone)) {
+            errors.phone = 'This field is required';
+        }
+        setFormErrors(errors);
     };
 
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
-
-        if (_id === undefined) {
-            setDepartment(department);
-            await departmentService
-                .create(department)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    return err;
-                });
-        } else {
-            setDepartment(department);
-            await departmentService
-                .update(_id, department)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    return err;
-                });
+        setFormErrors({});
+        const errors = {};
+        if (validator.isEmpty(department.name)) {
+            errors.name = 'This field is required';
         }
-        departmentService
-            .getAll({})
-            .then((response) => {
-                setJsonData(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        closeModal();
+        if (validator.isEmpty(department.address)) {
+            errors.address = 'This field is required';
+        }
+        if (validator.isEmpty(department.phone)) {
+            errors.phone = 'This field is required';
+        }
+
+        if (Object.keys(errors).length === 0) {
+            if (_id === undefined) {
+                setDepartment(department);
+                await departmentService
+                    .create(department)
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((err) => {
+                        return err;
+                    });
+                toast.success('🦄 Add department success!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored',
+                });
+            } else {
+                setDepartment(department);
+                await departmentService
+                    .update(_id, department)
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((err) => {
+                        return err;
+                    });
+                toast.success('🦄 Edit department success!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored',
+                });
+            }
+            departmentService
+                .getAll({})
+                .then((response) => {
+                    setJsonData(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            closeModal();
+        } else {
+            setFormErrors(errors);
+        }
     };
+
+    /// Modal confirm
+    const handleCancel = () => {
+        console.log('Cancel button clicked');
+    };
+
+    // validation
+    const [formErrors, setFormErrors] = useState('123');
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -163,16 +241,20 @@ const BlogManager = () => {
                                 <td className="border px-4 py-2">{post.name}</td>
                                 <td className="border px-4 py-2">{post.address}</td>
                                 <td className="border px-4 py-2">{post.phone}</td>
-                                <td style={{ width: 140 }} className="border px-2 py-2">
+                                <td style={{ width: 180 }} className="border px-2 py-2">
                                     <button
-                                        className="bg-blue-500 hover:bg-red-300 text-white font-bold py-1 px-2 rounded-full"
+                                        className="bg-blue-500 hover:bg-red-300 text-white font-bold py-1 px-2 mr-4 rounded-xl"
                                         onClick={handleButtonClick}
                                     >
                                         Sched
                                     </button>
                                     <button
-                                        className="bg-blue-500 hover:bg-red-300 text-white font-bold py-1 px-2 rounded-full"
-                                        onClick={handleButtonClick}
+                                        className="bg-blue-500 hover:bg-red-300 text-white font-bold py-1 px-2 rounded-xl"
+                                        onClick={() => {
+                                            console.log('id' + post._id);
+                                            setId(post._id);
+                                            navigate(generatePath('/employee/:id', { id }));
+                                        }}
                                     >
                                         Emp
                                     </button>
@@ -182,9 +264,19 @@ const BlogManager = () => {
                                         <button className="text-blue-600 hover:text-blue-800">
                                             <HiPencilAlt size={20} onClick={() => handleEdit(post._id, post.name, post.address, post.phone)} />
                                         </button>
-                                        <button className="text-red-600 hover:text-red-800">
-                                            <HiTrash size={20} onClick={handleDelete} />
-                                        </button>
+                                        <DialogBox
+                                            buttonText={
+                                                <span className="text-red-600 cursor-pointer hover:text-red-800">
+                                                    <HiTrash size={20} />
+                                                </span>
+                                            }
+                                            headerText="Delete department"
+                                            bodyText="Are you sure of your action? This action cannot be undone"
+                                            cancelText="Cancel"
+                                            confirmText="Confirm"
+                                            onCancel={handleCancel}
+                                            onConfirm={() => handleDelete(post._id)}
+                                        />
                                     </div>
                                 </td>
                             </tr>
@@ -210,7 +302,7 @@ const BlogManager = () => {
                     <form onSubmit={(event) => handleSubmit(event, department._id)}>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
-                                Tiêu đề
+                                Name
                             </label>
                             <input
                                 type="text"
@@ -218,39 +310,48 @@ const BlogManager = () => {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value={department.name}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                             />
+                            {department.name !== null && formErrors.name && <p className="text-red-500">{formErrors.name}</p>}
                         </div>
                         <div className="mb-4">
                             <label htmlFor="address" className="block text-gray-700 font-bold mb-2">
-                                Nội dung
+                                Address
                             </label>
                             <textarea
                                 id="address"
                                 value={department.address}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             ></textarea>
+                            {department.name !== null && formErrors.address && <p className="text-red-500">{formErrors.address}</p>}
                         </div>
 
                         <div className="mb-4">
                             <label htmlFor="phone" className="block text-gray-700 font-bold mb-2">
-                                Ảnh
+                                Phone
                             </label>
                             <input
                                 type="text"
                                 id="phone"
                                 value={department.phone}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
+                            {department.phone !== null && formErrors.phone && <p className="text-red-500">{formErrors.phone}</p>}
                         </div>
 
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Lưu
-                        </button>
+                        <div className="mb-4 float-right">
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Save
+                            </button>
+                        </div>
                     </form>
                 </Modal>
             </>
+            <ToastContainer />
         </div>
     );
 };

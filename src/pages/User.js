@@ -4,15 +4,18 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import Modal from '../components/Modal';
 import userService from '~/services/user';
-import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import DialogBox from '~/components/DialogBox';
+import validator from 'validator';
 
 const UserManager = () => {
-    const navigate = useNavigate();
     // useState modal
     const [isOpen, setIsOpen] = useState(false);
 
     const openModal = () => {
         setIsOpen(true);
+        setFormErrors({});
+
         setUser({
             email: '',
             phone: '',
@@ -92,6 +95,8 @@ const UserManager = () => {
     }, []);
 
     const handleEdit = (_id, email, phone, address, avatar, fullname, birthDay, departmentID, degreeID, salaryID) => {
+        setFormErrors({});
+
         if (_id !== undefined) {
             setUser({
                 ...user,
@@ -129,8 +134,25 @@ const UserManager = () => {
         }
     };
 
-    const handleDelete = (e) => {
-        navigate('/departmentManager');
+    const handleDelete = async (_id) => {
+        if (_id !== undefined) {
+            try {
+                await userService.banUser(_id);
+                setJsonData((prevData) => prevData.filter((item) => item._id !== _id));
+            } catch (error) {
+                console.log(error);
+            }
+            toast.success('🦄 Ban user success!', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'colored',
+            });
+        }
     };
 
     const [user, setUser] = useState({
@@ -153,41 +175,107 @@ const UserManager = () => {
             ...prevState,
             [id]: value,
         }));
+
+        const errors = {};
+        if (!value & validator.isEmpty(user.fullname)) {
+            errors.fullname = 'This field is required';
+        }
+        if (!value & validator.isEmpty(user.avatar)) {
+            errors.avatar = 'This field is required';
+        }
+        if (!value & validator.isEmail(user.email)) {
+            errors.email = 'This field is required';
+        }
+        if (!value & validator.isEmpty(user.phone)) {
+            errors.phone = 'This field is required';
+        }
+        if (!value & validator.isDate(user.birthDay)) {
+            errors.birthDay = 'This field is required';
+        }
+        if (!value & validator.isEmpty(user.adress)) {
+            errors.adress = 'This field is required';
+        }
+        setFormErrors(errors);
     };
 
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
+        setFormErrors({});
+        const errors = {};
 
-        if (_id === undefined) {
-            setUser(user);
-            await userService
-                .create(user)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    return err;
-                });
-        } else {
-            setUser(user);
-            await userService
-                .update(_id, user)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    return err;
-                });
+        if (validator.isEmpty(user.fullname)) {
+            errors.fullname = 'This field is required';
         }
-        userService
-            .getAll({})
-            .then((response) => {
-                setJsonData(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        closeModal();
+        if (validator.isEmpty(user.avatar)) {
+            errors.avatar = 'This field is required';
+        }
+        if (validator.isEmpty(user.email)) {
+            errors.email = 'This field is required';
+        }
+        if (validator.isEmpty(user.phone)) {
+            errors.phone = 'This field is required';
+        }
+        if (validator.isEmpty(user.birthDay)) {
+            errors.birthDay = 'This field is required';
+        }
+        if (validator.isEmpty(user.address)) {
+            errors.address = 'This field is required';
+        }
+
+        if (Object.keys(errors).length === 0) {
+            if (_id === undefined) {
+                setUser(user);
+                await userService
+                    .create(user)
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((err) => {
+                        return err;
+                    });
+                toast.success('🦄 Add user success!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored',
+                });
+            } else {
+                setUser(user);
+                await userService
+                    .update(_id, user)
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((err) => {
+                        return err;
+                    });
+                toast.success('🦄 Edit user success!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored',
+                });
+            }
+            userService
+                .getAll({})
+                .then((response) => {
+                    setJsonData(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            closeModal();
+        } else {
+            setFormErrors(errors);
+        }
     };
 
     // data
@@ -200,7 +288,13 @@ const UserManager = () => {
     const [selectedDegree, setSelectedDegree] = useState([]);
     const [selectedSalary, setSelectedSalary] = useState([]);
 
-    //get value combobox
+    /// Modal confirm
+    const handleCancel = () => {
+        console.log('Cancel button clicked');
+    };
+
+    // validation
+    const [formErrors, setFormErrors] = useState('123');
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,45 +342,58 @@ const UserManager = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {jsonData.sort(getSortingFunction(sorting.criteria, sorting.direction)).map((post, index) => (
-                            <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
-                                <td className="border px-4 py-2">{post.fullname}</td>
-                                <td className="border px-4 py-2">
-                                    <img src={post.avatar} alt={post.name} className="w-24 h-auto" />
-                                </td>
-                                <td className="border px-4 py-2">{post.departmentID}</td>
-                                <td className="border px-4 py-2">{post.phone}</td>
-                                <td className="border px-4 py-2">
-                                    {new Date(post.birthDay).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                </td>
-                                <td className="border px-4 py-2">
-                                    <div className="flex space-x-2">
-                                        <button className="text-blue-600 hover:text-blue-800">
-                                            <HiPencilAlt
-                                                size={20}
-                                                onClick={() =>
-                                                    handleEdit(
-                                                        post._id,
-                                                        post.email,
-                                                        post.phone,
-                                                        post.address,
-                                                        post.avatar,
-                                                        post.fullname,
-                                                        post.birthDay,
-                                                        post.departmentID,
-                                                        post.degreeID,
-                                                        post.salaryID,
-                                                    )
+                        {jsonData
+                            .filter((post) => post.active === true)
+                            .sort(getSortingFunction(sorting.criteria, sorting.direction))
+                            .map((post, index) => (
+                                <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
+                                    <td className="border px-4 py-2">{post.fullname}</td>
+                                    <td className="border px-4 py-2">
+                                        <img src={post.avatar} alt={post.name} className="w-24 h-auto" />
+                                    </td>
+                                    <td className="border px-4 py-2">{post.email}</td>
+                                    <td className="border px-4 py-2">{post.phone}</td>
+                                    <td className="border px-4 py-2">
+                                        {new Date(post.birthDay).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </td>
+                                    <td className="border px-4 py-2">
+                                        <div className="flex space-x-2">
+                                            <button className="text-blue-600 hover:text-blue-800">
+                                                <HiPencilAlt
+                                                    size={20}
+                                                    onClick={() =>
+                                                        handleEdit(
+                                                            post._id,
+                                                            post.email,
+                                                            post.phone,
+                                                            post.address,
+                                                            post.avatar,
+                                                            post.fullname,
+                                                            post.birthDay,
+                                                            post.departmentID,
+                                                            post.degreeID,
+                                                            post.salaryID,
+                                                        )
+                                                    }
+                                                />
+                                            </button>
+                                            <DialogBox
+                                                buttonText={
+                                                    <span className="text-red-600 cursor-pointer hover:text-red-800">
+                                                        <HiTrash size={20} />
+                                                    </span>
                                                 }
+                                                headerText="Delete Degree"
+                                                bodyText="Are you sure of your action? This action cannot be undone"
+                                                cancelText="Cancel"
+                                                confirmText="Confirm"
+                                                onCancel={handleCancel}
+                                                onConfirm={() => handleDelete(post._id)}
                                             />
-                                        </button>
-                                        <button className="text-red-600 hover:text-red-800">
-                                            <HiTrash size={20} onClick={handleDelete} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
@@ -316,7 +423,9 @@ const UserManager = () => {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value={user.fullname}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                             />
+                            {user.fullname !== null && formErrors.fullname && <p className="text-red-500">{formErrors.fullname}</p>}
                         </div>
 
                         <div className="mb-4">
@@ -329,7 +438,9 @@ const UserManager = () => {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value={user.avatar}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                             />
+                            {user.avatar !== null && formErrors.avatar && <p className="text-red-500">{formErrors.avatar}</p>}
                         </div>
 
                         <div className="mb-4">
@@ -338,12 +449,13 @@ const UserManager = () => {
                             </label>
                             <input
                                 type="email"
-                                readonly
                                 id="email"
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value={user.email}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                             />
+                            {user.email !== null && formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
                         </div>
 
                         <div className="mb-4">
@@ -356,7 +468,9 @@ const UserManager = () => {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value={user.phone}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                             />
+                            {user.phone !== null && formErrors.phone && <p className="text-red-500">{formErrors.phone}</p>}
                         </div>
                         <div className="mb-4">
                             <label htmlFor="dob" className="block text-gray-700 font-bold mb-2">
@@ -370,6 +484,7 @@ const UserManager = () => {
                                 onChange={handleChange}
                                 max={new Date().toISOString().slice(0, 10)}
                             />
+                            {user.birthDay !== null && formErrors.birthDay && <p className="text-red-500">{formErrors.birthDay}</p>}
                         </div>
                         <div className="mb-4">
                             <label htmlFor="address" className="block text-gray-700 font-bold mb-2">
@@ -381,7 +496,9 @@ const UserManager = () => {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value={user.address}
                                 onChange={handleChange}
+                                onBlur={handleChange}
                             />
+                            {user.address !== null && formErrors.address && <p className="text-red-500">{formErrors.address}</p>}
                         </div>
 
                         <div className="mb-4">
@@ -447,6 +564,7 @@ const UserManager = () => {
                     </form>
                 </Modal>
             </>
+            <ToastContainer />
         </div>
     );
 };

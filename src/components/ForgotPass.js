@@ -12,7 +12,7 @@ export default function ForgotPass({ setUser, setAuthState }) {
                 </div>
 
                 <div className="mt-8 flex flex-col gap-y-4">
-                    <button className="active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01]  ease-in-out transform py-4 bg-violet-500 rounded-xl text-white font-bold text-lg">
+                    <button className="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
                         Gửi Mail
                     </button>
                 </div>

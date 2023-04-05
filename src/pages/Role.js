@@ -1,11 +1,10 @@
 import React from 'react';
-import { HiPencilAlt, HiTrash } from 'react-icons/hi';
+import { HiPencilAlt } from 'react-icons/hi';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Modal from '../components/Modal';
 import roleService from '~/services/role';
 import permissionService from '~/services/permission';
-import { useNavigate } from 'react-router-dom';
 
 const Role = () => {
     // useState modal

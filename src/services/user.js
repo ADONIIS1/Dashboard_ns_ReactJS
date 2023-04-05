@@ -1,205 +1,191 @@
-import request from '~/utils/request'
-    
+import request from '~/utils/request';
 
-class userService{
+class userService {
+    getAll = async (req = {}) => {
+        // formBody {Object}
+        try {
+            const res = await request
+                .get('/user/getAll', JSON.stringify(req), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                })
 
-   getAll = async (req = {}) => { // formBody {Object}
-      try {
-       const res = await request.get('/user/getAll',JSON.stringify(req),{
-       headers: {
-          'Content-Type': 'application/json'
-          }
-       })
-       
-          .then((res) => {
-             return {
-                data : res.data,
-                status : res.status
-             };
-          })
-          .catch((err) => {
-             return {
-                data : err.response.data,
-                status : err.response.status
-             };
-          });
-          console.log(res)
-          return new Promise((resolve, reject) => {
-             if(res.status === 401){
-                reject(
-                   {
-                      status : res.status, 
-                      data : res.data
-                   });
-             }
-             resolve({status : res.status, data : res.data});
-         });
-       } catch (error) {
-          console.log(error);
-       }
-  }
-
-  create = async (req = {}) => { // formBody {Object}
-   try {
-    const res = await request.post('/user/create',JSON.stringify(req),{
-    headers: {
-       'Content-Type': 'application/json'
-       }
-    })
-    
-       .then((res) => {
-          return {
-             data : res.data,
-             status : res.status
-          };
-       })
-       .catch((err) => {
-          return {
-             data : err.response.data,
-             status : err.response.status
-          };
-       });
-       console.log(res)
-       return new Promise((resolve, reject) => {
-          if(res.status === 401){
-             reject(
-                {
-                   status : res.status, 
-                   data : res.data
+                .then((res) => {
+                    return {
+                        data: res.data,
+                        status: res.status,
+                    };
+                })
+                .catch((err) => {
+                    return {
+                        data: err.response.data,
+                        status: err.response.status,
+                    };
                 });
-          }
-          resolve({status : res.status, data : res.data});
-      });
-    } catch (error) {
-       console.log(error);
-    }
+            console.log(res);
+            return new Promise((resolve, reject) => {
+                if (res.status === 401) {
+                    reject({
+                        status: res.status,
+                        data: res.data,
+                    });
+                }
+                resolve({ status: res.status, data: res.data });
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-    
-   }
+    create = async (req = {}) => {
+        // formBody {Object}
+        try {
+            const res = await request
+                .post('/user/create', JSON.stringify(req), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                })
 
-   update = async (_id,req = {}) => {
-      try {
+                .then((res) => {
+                    return {
+                        data: res.data,
+                        status: res.status,
+                    };
+                })
+                .catch((err) => {
+                    return {
+                        data: err.response.data,
+                        status: err.response.status,
+                    };
+                });
+            console.log(res);
+            return new Promise((resolve, reject) => {
+                if (res.status === 401) {
+                    reject({
+                        status: res.status,
+                        data: res.data,
+                    });
+                }
+                resolve({ status: res.status, data: res.data });
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-       const res = await request.put(`/user/${_id}/update`,JSON.stringify(req),{
-       headers: {
-          'Content-Type': 'application/json'
-          }
-       })
-       
-          .then((res) => {
-             return {
-                data : res.data,
-                status : res.status
-             };
-          })
-          .catch((err) => {
-             return {
-                data : err.response.data,
-                status : err.response.status
-             };
-          });
-          console.log(res)
-          return new Promise((resolve, reject) => {
-             if(res.status === 401){
-                reject(
-                   {
-                      status : res.status, 
-                      data : res.data
-                   });
-             }
-             resolve({status : res.status, data : res.data});
-         });
-       } catch (error) {
-          console.log(error);
-      }
-   
-       
-   }
+    update = async (_id, req = {}) => {
+        try {
+            const res = await request
+                .put(`/user/${_id}/update`, JSON.stringify(req), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                })
 
-   delete = async (_id,req = {}) => {
-      try {
+                .then((res) => {
+                    return {
+                        data: res.data,
+                        status: res.status,
+                    };
+                })
+                .catch((err) => {
+                    return {
+                        data: err.response.data,
+                        status: err.response.status,
+                    };
+                });
+            console.log(res);
+            return new Promise((resolve, reject) => {
+                if (res.status === 401) {
+                    reject({
+                        status: res.status,
+                        data: res.data,
+                    });
+                }
+                resolve({ status: res.status, data: res.data });
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-       const res = await request.delete(`/user/${_id}/delete`,JSON.stringify(req),{
-       headers: {
-          'Content-Type': 'application/json'
-          }
-       })
-       
-          .then((res) => {
-             return {
-                data : res.data,
-                status : res.status
-             };
-          })
-          .catch((err) => {
-             return {
-                data : err.response.data,
-                status : err.response.status
-             };
-          });
-          console.log(res)
-          return new Promise((resolve, reject) => {
-             if(res.status === 401){
-                reject(
-                   {
-                      status : res.status, 
-                      data : res.data
-                   });
-             }
-             resolve({status : res.status, data : res.data});
-         });
-       } catch (error) {
-          console.log(error);
-       }
-   
-       
-   }   
-   getDepartment = async (_id,req = {}) => {
-      try {
+    delete = async (_id, req = {}) => {
+        try {
+            const res = await request
+                .delete(`/user/${_id}/delete`, JSON.stringify(req), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                })
 
-       const res = await request.get(`/department/getAll`,JSON.stringify(req),{
-       headers: {
-          'Content-Type': 'application/json'
-          }
-       })
-       
-          .then((res) => {
-             return {
-                data : res.data,
-                status : res.status
-             };
-          })
-          .catch((err) => {
-             return {
-                data : err.response.data,
-                status : err.response.status
-             };
-          });
-          console.log(res)
-          return new Promise((resolve, reject) => {
-             if(res.status === 401){
-                reject(
-                   {
-                      status : res.status, 
-                      data : res.data
-                   });
-             }
-             resolve({status : res.status, data : res.data});
-         });
-       } catch (error) {
-          console.log(error);
-      }
-   
-       
-   }
+                .then((res) => {
+                    return {
+                        data: res.data,
+                        status: res.status,
+                    };
+                })
+                .catch((err) => {
+                    return {
+                        data: err.response.data,
+                        status: err.response.status,
+                    };
+                });
+            console.log(res);
+            return new Promise((resolve, reject) => {
+                if (res.status === 401) {
+                    reject({
+                        status: res.status,
+                        data: res.data,
+                    });
+                }
+                resolve({ status: res.status, data: res.data });
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    getDepartment = async (_id, req = {}) => {
+        try {
+            const res = await request
+                .get(`/department/getAll`, JSON.stringify(req), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                })
 
-   
-      
-      
-       
+                .then((res) => {
+                    return {
+                        data: res.data,
+                        status: res.status,
+                    };
+                })
+                .catch((err) => {
+                    return {
+                        data: err.response.data,
+                        status: err.response.status,
+                    };
+                });
+            console.log(res);
+            return new Promise((resolve, reject) => {
+                if (res.status === 401) {
+                    reject({
+                        status: res.status,
+                        data: res.data,
+                    });
+                }
+                resolve({ status: res.status, data: res.data });
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
 }
-    
-export default new userService
-     
 
-
+export default new userService();
