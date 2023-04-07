@@ -3,12 +3,13 @@ import request from '~/utils/request';
 class degreeService {
     getAll = async (req = {}) => {
         // formBody {Object}
+        console.log('Check ',req);
         try {
             const res = await request
-                .get('/degree/getAll', JSON.stringify(req), {
+                .get('/degree/getAll',JSON.stringify(req) , {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     },
                 })
 
@@ -43,7 +44,7 @@ class degreeService {
         // formBody {Object}
         try {
             const res = await request
-                .post('/degree/create', JSON.stringify(req), {
+                .post('/degree/create',req, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -77,10 +78,10 @@ class degreeService {
         }
     };
 
-    update = async (_id, req = {}) => {
+    update = async (req = {}) => {
         try {
             const res = await request
-                .put(`/degree/${_id}/update`, JSON.stringify(req), {
+                .post(`/degree/update`, req, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import Modal from '../components/Modal';
 import departmentService from '~/services/department';
-import { useNavigate, generatePath } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import DialogBox from '~/components/DialogBox';
 import validator from 'validator';
@@ -13,11 +13,13 @@ const BlogManager = () => {
     const navigate = useNavigate();
     // useState modal
     const [isOpen, setIsOpen] = useState(false);
+    const [txtSearch, setTxtSearch] = useState('');
 
     const openModal = () => {
         setIsOpen(true);
         setFormErrors({});
         setDepartment({
+            _id : '',
             name: '',
             address: '',
             phone: '',
@@ -31,7 +33,6 @@ const BlogManager = () => {
     // sort
     const [sorting, setSorting] = useState({ criteria: null, direction: 'asc' });
 
-    const [id, setId] = useState();
 
     const getSortingFunction = (criteria, direction) => {
         const directionModifier = direction === 'asc' ? 1 : -1;
@@ -72,7 +73,16 @@ const BlogManager = () => {
             setIsOpen(true);
         }
     };
-
+    const handleClick = async() => {
+        departmentService
+        .getAll({name : txtSearch})
+        .then((response) => {
+            setJsonData(response.data.filter(p => p.name.toUpperCase().includes(txtSearch.toUpperCase())));
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
     const handleDelete = async (_id) => {
         if (_id !== undefined) {
             try {
@@ -99,6 +109,7 @@ const BlogManager = () => {
     };
 
     const [department, setDepartment] = useState({
+        _id : '',
         name: '',
         address: '',
         phone: '',
@@ -122,7 +133,10 @@ const BlogManager = () => {
         }
         setFormErrors(errors);
     };
-
+    const handleChangetxtSearch = (event) => {
+        const txtSearch = event.target.value
+        setTxtSearch(txtSearch);
+    };
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
         setFormErrors({});
@@ -136,12 +150,11 @@ const BlogManager = () => {
         if (validator.isEmpty(department.phone)) {
             errors.phone = 'This field is required';
         }
-
         if (Object.keys(errors).length === 0) {
-            if (_id === undefined) {
+            if (_id === '') {
                 setDepartment(department);
                 await departmentService
-                    .create(department)
+                    .create({name : department.name,address : department.address,phone : department.phone})
                     .then((res) => {
                         return res;
                     })
@@ -161,7 +174,7 @@ const BlogManager = () => {
             } else {
                 setDepartment(department);
                 await departmentService
-                    .update(_id, department)
+                    .update(department)
                     .then((res) => {
                         return res;
                     })
@@ -204,9 +217,13 @@ const BlogManager = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-extrabold text-gray-900 mb-4">Department Posts</h1>
-            <div className="mt-8 flex justify-end">
-                <button className="bg-blue-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded" onClick={openModal}>
-                    +
+            <div className="mt-8 flex justify-start">
+                <input type='text' value={txtSearch} onChange={handleChangetxtSearch} placeholder='Nhập tên bằng cấp' className="form-control font-bold" />
+                <button onClick={handleClick} className="bg-green-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded">
+                    Tìm kiếm
+                </button> 
+                <button style={{marginLeft : "700px"}} className="bg-blue-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded" onClick={openModal}>
+                    Thêm mới
                 </button>
             </div>
             <div className="w-full overflow-x-auto" style={{ paddingTop: '20px' }}>
@@ -231,7 +248,6 @@ const BlogManager = () => {
                             >
                                 Phone
                             </th>
-                            <th className="px-4 py-2"></th>
                             <th className="px-4 py-2">Actions</th>
                         </tr>
                     </thead>
@@ -241,24 +257,6 @@ const BlogManager = () => {
                                 <td className="border px-4 py-2">{post.name}</td>
                                 <td className="border px-4 py-2">{post.address}</td>
                                 <td className="border px-4 py-2">{post.phone}</td>
-                                <td style={{ width: 180 }} className="border px-2 py-2">
-                                    <button
-                                        className="bg-blue-500 hover:bg-red-300 text-white font-bold py-1 px-2 mr-4 rounded-xl"
-                                        onClick={handleButtonClick}
-                                    >
-                                        Sched
-                                    </button>
-                                    <button
-                                        className="bg-blue-500 hover:bg-red-300 text-white font-bold py-1 px-2 rounded-xl"
-                                        onClick={() => {
-                                            console.log('id' + post._id);
-                                            setId(post._id);
-                                            navigate(generatePath('/employee/:id', { id }));
-                                        }}
-                                    >
-                                        Emp
-                                    </button>
-                                </td>
                                 <td className="border px-4 py-2">
                                     <div className="flex space-x-2">
                                         <button className="text-blue-600 hover:text-blue-800">

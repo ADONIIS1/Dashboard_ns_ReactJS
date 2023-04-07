@@ -13,12 +13,28 @@ const SalaryManager = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     const openModal = () => {
-        setIsOpen(true);
-        setSalary({
-            name: '',
-            basic_salary: '',
-            HSL: '',
-        });
+        if(localStorage.getItem('roles').includes('Salary.CREATE')){
+            setIsOpen(true);
+            setSalary({
+                _id : '',
+                name: '',
+                basic_salary: '',
+                HSL: '',
+            });
+        }
+        else{
+            toast.error('Bạn không có quyền truy cập', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+            });
+        }
+       
     };
 
     const closeModal = () => {
@@ -26,27 +42,13 @@ const SalaryManager = () => {
     };
 
     // sort
-    const [sorting, setSorting] = useState({ criteria: null, direction: 'asc' });
-
-    const getSortingFunction = (criteria, direction) => {
-        const directionModifier = direction === 'asc' ? 1 : -1;
-        return (a, b) => {
-            if (a[criteria] < b[criteria]) {
-                return -1 * directionModifier;
-            }
-            if (a[criteria] > b[criteria]) {
-                return 1 * directionModifier;
-            }
-            return 0;
-        };
-    };
 
     // data
     const [jsonData, setJsonData] = useState([]);
 
     useEffect(() => {
         salaryService
-            .getAll({})
+            .getAll()
             .then((response) => {
                 setJsonData(response.data);
             })
@@ -56,23 +58,39 @@ const SalaryManager = () => {
     }, []);
 
     const handleEdit = (id, name, basic_salary, HSL) => {
-        setFormErrors({});
-        if (id !== undefined) {
-            setSalary({
-                _id: id,
-                name: name,
-                basic_salary: basic_salary,
-                HSL: HSL,
-            });
-            setIsOpen(true);
+        if(localStorage.getItem('roles').includes('Salary.UPDATE')){
+            setFormErrors({});
+            if (id !== undefined) {
+                setSalary({
+                    _id: id,
+                    name: name,
+                    basic_salary: basic_salary,
+                    HSL: HSL,
+                });
+                setIsOpen(true);
+            }
         }
+        else{
+            toast.error('Bạn không có quyền truy cập', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+            });
+        }
+       
+        
     };
 
-    const handleDelete = async (_id) => {
-        if (_id !== undefined) {
+    const handleDelete = async (id) => {
+        if (id !== undefined) {
             try {
-                await salaryService.delete(_id);
-                setJsonData((prevData) => prevData.filter((item) => item._id !== _id));
+                await salaryService.delete(id);
+                setJsonData((prevData) => prevData.filter((item) => item._id !== id));
             } catch (error) {
                 console.log(error);
             }
@@ -106,16 +124,16 @@ const SalaryManager = () => {
         if (!value && validator.isEmpty(salary.name)) {
             errors.name = 'This field is required';
         }
-        if (!value && validator.isEmpty(salary.basic_salary)) {
+        if (!value && validator.isEmpty(parseFloat(salary.basic_salary))) {
             errors.basic_salary = 'This field is required';
         }
-        if (!value && validator.isEmpty(salary.HSL)) {
+        if (!value && validator.isEmpty(parseInt(salary.HSL))) {
             errors.HSL = 'This field is required';
         }
         setFormErrors(errors);
     };
 
-    const handleSubmit = async (event, _id) => {
+    const handleSubmit = async (event, id) => {
         event.preventDefault();
         const errors = {};
         setFormErrors(errors);
@@ -131,10 +149,10 @@ const SalaryManager = () => {
         }
 
         if (Object.keys(errors).length === 0) {
-            if (_id === undefined) {
+            if (id === '') {
                 setSalary(salary);
                 await salaryService
-                    .create(salary)
+                    .create({name : salary.name,basic_salary : salary.basic_salary,HSL : salary.HSL})
                     .then((res) => {
                         return res;
                     })
@@ -154,7 +172,7 @@ const SalaryManager = () => {
             } else {
                 setSalary(salary);
                 await salaryService
-                    .update(_id, salary)
+                    .update(salary)
                     .then((res) => {
                         return res;
                     })
@@ -208,27 +226,24 @@ const SalaryManager = () => {
                         <tr>
                             <th
                                 className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'name', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
                             >
-                                Name
+                                Tên
                             </th>
                             <th
                                 className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'basic_salary', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
                             >
-                                Basic_salary
+                                Lương cơ bản
                             </th>
                             <th
                                 className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'HSL', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
                             >
-                                HSL
+                                Hệ số lương
                             </th>
                             <th className="px-4 py-2">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {jsonData.sort(getSortingFunction(sorting.criteria, sorting.direction)).map((post, index) => (
+                        {jsonData.map((post, index) => (
                             <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
                                 <td className="border px-4 py-2">{post.name}</td>
                                 <td className="border px-4 py-2">{post.basic_salary}</td>

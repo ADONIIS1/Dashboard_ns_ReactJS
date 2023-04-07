@@ -8,18 +8,33 @@ import { ToastContainer, toast } from 'react-toastify';
 import DialogBox from '~/components/DialogBox';
 import validator from 'validator';
 
-const BlogManager = () => {
+const BlogManager = ({roles}) => {
     // useState modal
     const [isOpen, setIsOpen] = useState(false);
 
     const openModal = () => {
-        setIsOpen(true);
-        setFormErrors({});
-        setBlog({
-            title: '',
-            image: '',
-            content: '',
-        });
+        if(roles.includes('Blog.CREATE'))
+        {
+            setIsOpen(true);
+            setFormErrors({});
+            setBlog({
+                title: '',
+                image: '',
+                content: '',
+            });
+        }
+        else{
+            toast.error('Bạn không có quyền truy cập', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+            });
+        }
     };
 
     const closeModal = () => {

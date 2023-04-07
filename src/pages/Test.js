@@ -32,33 +32,33 @@ const Test = () => {
         userService
             .getAll({})
             .then((response) => {
-                setJsonData(response.data);
+                setJsonData(response.data.data);
             })
             .catch((error) => {
                 console.log(error);
             });
     }, []);
 
-    const handleUnBan = async (event, _id) => {
+    const handleUnBan = async (event, id) => {
         event.preventDefault();
-        if (_id !== undefined) {
+        if (id !== undefined) {
             try {
-                await userService.unBanUser(_id);
-                setJsonData((prevData) => prevData.filter((item) => item._id !== _id));
+                await userService.unBanUser(id);
+                setJsonData((prevData) => prevData.filter((item) => item.id !== id));
             } catch (error) {
                 console.log(error);
             }
         }
     };
 
-    const handleDelete = async (event, _id) => {
+    const handleDelete = async (event, id) => {
         event.preventDefault();
-        console.log('Check id:', _id);
+        console.log('Check id:', id);
 
-        if (_id !== undefined) {
+        if (id !== undefined) {
             try {
-                await userService.delete(_id);
-                setJsonData((prevData) => prevData.filter((item) => item._id !== _id));
+                await userService.delete(id);
+                setJsonData((prevData) => prevData.filter((item) => item.id !== id));
             } catch (error) {
                 console.log(error);
             }
@@ -118,19 +118,19 @@ const Test = () => {
                             .sort(getSortingFunction(sorting.criteria, sorting.direction))
                             .map((post, index) => (
                                 <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
-                                    <td className="border px-4 py-2">{post.fullname}</td>
+                                    <td className="border px-4 py-2">{post.fullName}</td>
                                     <td className="border px-4 py-2">
-                                        <img src={post.avatar} alt={post.name} className="w-24 h-auto" />
+                                        <img src={post.avatar} alt={post.username} className="w-24 h-auto" />
                                     </td>
                                     <td className="border px-4 py-2">{post.email}</td>
                                     <td className="border px-4 py-2">{post.phone}</td>
                                     <td className="border px-4 py-2">
                                         <div className="flex space-x-2">
                                             <button className="text-blue-600 hover:text-blue-800">
-                                                <FaPlusCircle size={20} onClick={(event) => handleUnBan(event, post._id)} />
+                                                <FaPlusCircle size={20} onClick={(event) => handleUnBan(event, post.id)} />
                                             </button>
                                             <button className="text-red-600 hover:text-red-800">
-                                                <HiTrash size={20} onClick={(event) => handleDelete(event, post._id)} />
+                                                <HiTrash size={20} onClick={(event) => handleDelete(event, post.id)} />
                                             </button>
                                         </div>
                                     </td>

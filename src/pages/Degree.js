@@ -10,7 +10,7 @@ import validator from 'validator';
 
 const Degree = () => {
     const [isOpen, setIsOpen] = useState(false);
-
+    const [txtSearch, setTxtSearch] = useState('');
     const openModal = () => {
         setIsOpen(true);
         setFormErrors({});
@@ -24,7 +24,7 @@ const Degree = () => {
     const closeModal = () => {
         setIsOpen(false);
     };
-
+    
     // sort
     const [sorting, setSorting] = useState({ criteria: null, direction: 'asc' });
 
@@ -48,18 +48,16 @@ const Degree = () => {
         degreeService
             .getAll({})
             .then((response) => {
+                console.log('Check ',response);
                 setJsonData(response.data);
             })
-            .catch((error) => {
-                console.log(error);
-            });
     }, []);
-
-    const handleEdit = (id, name, specialized, majors) => {
+    console.log('Check',jsonData);
+    const handleEdit = (_id, name, specialized, majors) => {
         setFormErrors({});
-        if (id !== null) {
+        if (_id !== null) {
             setDegree({
-                _id: id,
+                _id: _id,
                 name: name,
                 specialized: specialized,
                 majors: majors,
@@ -67,7 +65,16 @@ const Degree = () => {
         }
         setIsOpen(true);
     };
-
+    const handleClick = async() => {
+        degreeService
+        .getAll({name : txtSearch})
+        .then((response) => {
+            setJsonData(response.data.filter(p => p.name.toUpperCase().includes(txtSearch.toUpperCase())));
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
     const handleDelete = async (_id) => {
         if (_id !== undefined) {
             try {
@@ -97,10 +104,10 @@ const Degree = () => {
     });
 
     const handleChange = (event) => {
-        const { id, value } = event.target;
+        const { _id, value } = event.target;
         setDegree((prevState) => ({
             ...prevState,
-            [id]: value,
+            [_id]: value,
         }));
         const errors = {};
         if (validator.isEmpty(degree.name)) {
@@ -114,7 +121,10 @@ const Degree = () => {
         }
         setFormErrors(errors);
     };
-
+    const handleChangetxtSearch = (event) => {
+        const txtSearch = event.target.value
+        setTxtSearch(txtSearch);
+    };
     const handleSubmit = async (event, _id) => {
         event.preventDefault();
         setFormErrors({});
@@ -142,7 +152,7 @@ const Degree = () => {
                 toast.success('🦄 Add degree success!', {
                     position: 'top-right',
                     autoClose: 5000,
-                    hideProgressBar: false,
+                    h_ideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
@@ -162,7 +172,7 @@ const Degree = () => {
                 toast.success('🦄 Edit degree success!', {
                     position: 'top-right',
                     autoClose: 5000,
-                    hideProgressBar: false,
+                    h_ideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
@@ -189,15 +199,19 @@ const Degree = () => {
         console.log('Cancel button clicked');
     };
 
-    // validation
+    // val_idation
     const [formErrors, setFormErrors] = useState('123');
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-extrabold text-gray-900 mb-4">Degree Posts</h1>
-            <div className="mt-8 flex justify-end">
-                <button className="bg-blue-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded" onClick={openModal}>
-                    +
+            <div className="mt-8 flex justify-start">
+                <input type='text' value={txtSearch} onChange={handleChangetxtSearch} placeholder='Nhập tên bằng cấp' className="form-control font-bold" />
+                <button onClick={handleClick} className="bg-green-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded">
+                    Tìm kiếm
+                </button>            
+                <button style={{marginLeft : "700px"}} className="bg-blue-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded" onClick={openModal}>
+                    Thêm mới
                 </button>
             </div>
             <div className="w-full overflow-x-auto" style={{ paddingTop: '20px' }}>
@@ -226,7 +240,7 @@ const Degree = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {jsonData.sort(getSortingFunction(sorting.criteria, sorting.direction)).map((post, index) => (
+                        {jsonData.map((post, index) => (
                             <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
                                 <td className="border px-4 py-2">{post.name}</td>
                                 <td className="border px-4 py-2">{post.specialized}</td>

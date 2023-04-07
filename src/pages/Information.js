@@ -1,35 +1,27 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import authService from '~/services/auth';
-function Information() {
-    const [author, setAuthor] = useState(true);
+import userService from '~/services/user'
+import { ToastContainer, toast } from 'react-toastify';
+
+function Information({roles}) {
     const [formData, setFormData] = useState({
+        _id : '',
         email: '',
         phone: '',
-        name: '',
+        fullname: '',
         address: '',
-        birthday: '',
+        birthDay: '',
     });
     React.useEffect(() => {
-        const dataUser = async () => {
-            await authService
-                .getCurrentUser()
-                .then((res) => {
-                    if (res === false) {
-                        setAuthor(res);
-                    }
-                    return res;
-                })
-                .catch((err) => {
-                    console.log('Check Catch');
-                    return err;
-                });
-        };
-        console.log(dataUser(localStorage.getItem('token')));
+        let user = JSON.parse(localStorage.getItem("user"));
+        setFormData({
+            _id : user._id,
+            email : user.email,
+            phone : user.phone,
+            fullname:  user.fullname,
+            address:  user.address,
+            birthDay:  user.birthDay,
+        })  
     }, []);
-    if (!author) {
-        return <Navigate to={'/ecommerce'} />;
-    }
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -39,7 +31,27 @@ function Information() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
+        userService.update(formData);
+
+        localStorage.setItem('user',JSON.stringify({
+            _id : formData._id,
+            email : formData.email,
+            fullname : formData.fullname,
+            address : formData.address,
+            phone : formData.phone,
+            birthDay : formData.birthDay,
+            avatar : formData.avatar
+        }))
+        toast.success('Bạn đã sửa thông tin thành công', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                });
     };
 
     return (
@@ -72,6 +84,7 @@ function Information() {
                                 type="email"
                                 name="email"
                                 id="email"
+                                disabled="disabled"
                                 value={formData.email}
                                 onChange={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -92,13 +105,13 @@ function Information() {
                         </div>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
-                                Name
+                                Full Name
                             </label>
                             <input
                                 type="text"
-                                name="name"
-                                id="name"
-                                value={formData.name}
+                                name="fullname"
+                                id="fullname"
+                                value={formData.fullname}
                                 onChange={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
@@ -109,9 +122,9 @@ function Information() {
                             </label>
                             <input
                                 type="date"
-                                name="dob"
-                                id="dob"
-                                value={formData.dob}
+                                name="birthDay"
+                                id="birthDay"
+                                value={formData.birthDay ? formData.birthDay.slice(0, 10) : ''}
                                 onChange={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
@@ -139,6 +152,7 @@ function Information() {
                     </form>
                 </div>
             </div>
+            <ToastContainer/>
         </div>
     );
 }

@@ -6,7 +6,7 @@ import authService from '~/services/auth';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-
+import jwt_decode from 'jwt-decode';
 function Login() {
     const navigate = useNavigate();
     const [userInfo, setUser] = useState({
@@ -20,38 +20,58 @@ function Login() {
     const handleSubmit = async (event) => {
         try {
             event.preventDefault();
-            const data = await authService
-                .login(userInfo)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    //console.log('Check data : ',err);
-                    return err;
-                });
-            if (data.status === 422) {
-                toast.warning(`${data.data.message}`, {
-                    position: toast.POSITION.TOP_RIGHT,
-                });
-                return;
-            }
-            if (data.status === 404) {
-                toast.warning(`${data.data.message}`, {
-                    position: toast.POSITION.TOP_RIGHT,
-                });
-                return;
-            }
-            if (data.status === 401) {
-                toast.error('Email or Password is not correct !', {
-                    position: toast.POSITION.TOP_RIGHT,
-                });
-                return;
-            }
-            if (data.status === 200) {
-                localStorage.setItem('token', data.data.token);
-                localStorage.setItem('refreshtoken', data.data.refreshtoken);
-                navigate('/ecommerce');
-            }
+
+                    const data = await authService
+                    .login(userInfo)
+                    .then((res) => {
+                        console.log('Check res' , res);
+                        return res;
+                    })
+                    .catch((err) => {
+                        //console.log('Check data : ',err);
+                        return err;
+                    });
+                if (data.status === 422) {
+                    toast.warning(`${data.data.message}`, {
+                        position: toast.POSITION.TOP_RIGHT,
+                    });
+                    return;
+                }
+                if (data.status === 404) {
+                    toast.warning(`${data.data.message}`, {
+                        position: toast.POSITION.TOP_RIGHT,
+                    });
+                    return;
+                }
+                if (data.status === 401) {
+                    toast.error('Email or Password is not correct !', {
+                        position: toast.POSITION.TOP_RIGHT,
+                    });
+                    return;
+                }
+                if (data.status === 200) {
+                    const decoded = jwt_decode(data.data.token);
+                    localStorage.setItem('roles', decoded.roles);
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('id', decoded.id);
+                    localStorage.setItem('refreshtoken', data.data.refreshtoken);
+                    const user = await authService
+                    .getCurrentUser()
+                    .then((res) => {
+                        return res.data;
+                    });
+                    localStorage.setItem('user',JSON.stringify({
+                        _id : user._id,
+                        email : user.email,
+                        fullname : user.fullname,
+                        address : user.address,
+                        phone : user.phone,
+                        birthDay : user.birthDay,
+                        avatar : user.avatar
+                    }))
+                    navigate('/information');
+                }
+            
         } catch (error) {
             console.log(error);
         }

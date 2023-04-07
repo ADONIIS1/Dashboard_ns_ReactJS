@@ -36,6 +36,41 @@ class authService {
         }
     };
 
+    getCurrentUser = async () => {
+        try {
+            const res = await request
+                .get('/user/getCurrentUser', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization : `Bearer ${localStorage.getItem('token')}`
+                    },
+                })
+                .then((res) => {
+                    return {
+                        data: res.data,
+                        status: res.status,
+                    };
+                })
+                .catch((err) => {
+                    return {
+                        data: err.response.data,
+                        status: err.response.status,
+                    };
+                });
+            return new Promise((resolve, reject) => {
+                if (res.status === 401) {
+                    reject({
+                        status: res.status,
+                        data: res.data,
+                    });
+                }
+                resolve({ status: res.status, data: res.data });
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     testAuthen = async () => {
         try {
             console.log('Check Request : ');
@@ -43,7 +78,7 @@ class authService {
                 .get('/auth/testAuthentication', {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     },
                 }) // text -> JSON
                 //const res = await request.post('/api/v1/auth/login',JSON.stringify(req),)  // text -> JSON
@@ -73,7 +108,7 @@ class authService {
             .get('/auth/refreshtoken', {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${refreshtoken}`,
+                    'Authorization': `Bearer ${refreshtoken}`,
                 },
             })
             .then((res) => {
@@ -106,7 +141,7 @@ class authService {
             .get('/auth/lstUser', {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
             })
             .then((res) => {
@@ -123,25 +158,7 @@ class authService {
             });
         return res;
     };
-    getCurrentUser = async () => {
-        const res = await request
-            .get('/auth/getCurrentUser', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            })
-            .then((res) => {
-                return {
-                    data: res.data,
-                    status: res.status,
-                };
-            })
-            .catch((err) => {
-                return false;
-            });
-        return res;
-    };
+    
 }
 
 export default new authService();

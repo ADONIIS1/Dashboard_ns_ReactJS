@@ -1,10 +1,10 @@
 import request from '~/utils/request';
 class roleService {
-    getAll = async (req = {}) => {
+    getAll = async () => {
         // formBody {Object}
         try {
             const res = await request
-                .get('/role/getAll', JSON.stringify(req), {
+                .get('/role/getAll', {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -75,10 +75,10 @@ class roleService {
         }
     };
 
-    update = async (_id, req = {}) => {
+    update = async (req = {}) => {
         try {
             const res = await request
-                .put(`/role/${_id}/update`, JSON.stringify(req), {
+                .post(`/role/update`, JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,

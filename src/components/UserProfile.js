@@ -16,6 +16,8 @@ const UserProfile = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("refreshtoken");
         localStorage.removeItem("roles");
+        localStorage.removeItem("user");
+        localStorage.removeItem("id");
         navigate('/login')
     }
     return (

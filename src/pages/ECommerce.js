@@ -1,5 +1,5 @@
 function ECommerce() {
-    return <h2>ECommerce page</h2>;
+    return <h2>DashBoard</h2>;
 }
 
 export default ECommerce;

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import Modal from '../components/Modal';
 import userService from '~/services/user';
+import roleService from '~/services/role';
 import { ToastContainer, toast } from 'react-toastify';
 import DialogBox from '~/components/DialogBox';
 import validator from 'validator';
@@ -11,71 +12,107 @@ import validator from 'validator';
 const UserManager = () => {
     // useState modal
     const [isOpen, setIsOpen] = useState(false);
-
+    const [isOpen2, setIsOpen2] = useState(false);
     const openModal = () => {
-        setIsOpen(true);
-        setFormErrors({});
-
-        setUser({
-            email: '',
-            phone: '',
-            address: '',
-            avatar: '',
-            username: '',
-            fullname: '',
-            birthDay: '',
-            departmentID: '',
-            degreeID: '',
-            salaryID: '',
-        });
+        if(localStorage.getItem('roles').includes('User.CREATE','User.UPDATE')){
+            setIsOpen(true);
+            setFormErrors({});
+            setUser({
+                email: '',
+                phone: '',
+                address: '',
+                password : '',
+                avatar: '',
+                username: '',
+                fullname: '',
+                birthDay: '',
+                departmentID: '',
+                degreeID: '',
+                salaryID: '',
+            });
+        }
+        else{
+            toast.error('Bạn không có quyền truy cập', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+            });
+        }
+        
     };
-
+    const openModal2 = () => {
+        if(localStorage.getItem('roles').includes('User.CREATE','User.UPDATE')){
+            setIsOpen2(true);
+        }
+        else{
+            toast.error('Bạn không có quyền truy cập', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+            });
+        }
+    };
     const closeModal = () => {
         setIsOpen(false);
     };
 
-    // sort
-    const [sorting, setSorting] = useState({ criteria: null, direction: 'asc' });
-
-    const getSortingFunction = (criteria, direction) => {
-        const directionModifier = direction === 'asc' ? 1 : -1;
-        return (a, b) => {
-            if (a[criteria] < b[criteria]) {
-                return -1 * directionModifier;
-            }
-            if (a[criteria] > b[criteria]) {
-                return 1 * directionModifier;
-            }
-            return 0;
-        };
+    const closeModal2 = () => {
+        setIsOpen2(false);
     };
+
+    // // sort
+    // const [sorting, setSorting] = useState({ criteria: null, direction: 'asc' });
+
+    // const getSortingFunction = (criteria, direction) => {
+    //     const directionModifier = direction === 'asc' ? 1 : -1;
+    //     return (a, b) => {
+    //         if (a[criteria] < b[criteria]) {
+    //             return -1 * directionModifier;
+    //         }
+    //         if (a[criteria] > b[criteria]) {
+    //             return 1 * directionModifier;
+    //         }
+    //         return 0;
+    //     };
+    // };
 
     // data
     const [jsonData, setJsonData] = useState([]);
-
+    const [lstRole,setLstRole] = useState([])
+    const [rolesData,setRolesData] = useState([])
+    const [userDetail,setUserDetail] = useState({
+        _id : '',
+        fullname : ''
+    })
     useEffect(() => {
         userService
-            .getAll({})
+            .getAll()
             .then((response) => {
                 setJsonData(response.data);
             })
-            .catch((error) => {
-                console.log(error);
-            });
 
         // lấy department option
         userService
-            .getDepartment({})
+            .getDepartment()
             .then((response) => {
                 setOptionDepartment(response.data);
             })
             .catch((error) => {
-                console.log(error);
             });
 
         //lấy degree option
         userService
-            .getDegree({})
+            .getDegree()
             .then((response) => {
                 setOptionDegree(response.data);
             })
@@ -85,25 +122,40 @@ const UserManager = () => {
 
         //lấy salary option
         userService
-            .getSalary({})
+            .getSalary()
             .then((response) => {
                 setOptionSalary(response.data);
             })
             .catch((error) => {
                 console.log(error);
             });
+        roleService.getAll().then(res => {
+            setLstRole(res.data)
+        })
     }, []);
+    const handleEditRole = (userId, fullname) => {
+        setUserDetail({
+            _id : userId,
+            fullname : fullname
+        })
+        userService.getById(userId).then((res) => {
+            setRolesData(res.data.roles);
+        });
+        if (userId !== null) {
+            openModal2();
+        }
+    };
+    const handleEdit = (id, email, phone, address, password,avatar, fullname, birthDay, departmentID, degreeID, salaryID) => {
+        //setFormErrors({});
 
-    const handleEdit = (_id, email, phone, address, avatar, fullname, birthDay, departmentID, degreeID, salaryID) => {
-        setFormErrors({});
-
-        if (_id !== undefined) {
+        if (id !== undefined) {
             setUser({
                 ...user,
-                _id: _id,
+                _id: id,
                 email: email,
                 phone: phone,
                 address: address,
+                password : password,
                 avatar: avatar,
                 fullname: fullname,
                 birthDay: birthDay,
@@ -113,19 +165,19 @@ const UserManager = () => {
             });
 
             for (let i = 0; i < optionDepartment.length; i++) {
-                if (optionDepartment[i]._id === departmentID) {
+                if (optionDepartment[i].id === departmentID) {
                     setSelectedDepartment(optionDepartment[i]);
                 }
             }
 
             for (let j = 0; j < optionDegree.length; j++) {
-                if (optionDegree[j]._id === degreeID) {
+                if (optionDegree[j].id === degreeID) {
                     setSelectedDegree(optionDegree[j]);
                 }
             }
 
             for (let k = 0; k < optionSalary.length; k++) {
-                if (optionSalary[k]._id === salaryID) {
+                if (optionSalary[k].id === salaryID) {
                     setSelectedSalary(optionSalary[k]);
                 }
             }
@@ -134,15 +186,15 @@ const UserManager = () => {
         }
     };
 
-    const handleDelete = async (_id) => {
-        if (_id !== undefined) {
+    const handleDelete = async (id, email, phone, address, password,avatar, fullname, birthDay, departmentID, degreeID, salaryID) => {
+        if (id !== undefined) {
             try {
-                await userService.banUser(_id);
-                setJsonData((prevData) => prevData.filter((item) => item._id !== _id));
+
+                await userService.update(user);
+                setJsonData((prevData) => prevData.filter((item) => item._id !== id));
             } catch (error) {
-                console.log(error);
             }
-            toast.success('🦄 Ban user success!', {
+            toast.success('🦄 Lock user success!', {
                 position: 'top-right',
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -162,11 +214,12 @@ const UserManager = () => {
         address: '',
         avatar: '',
         fullname: '',
+        password : '',
         username: '',
         birthDay: '',
-        departmentID: '',
-        degreeID: '',
-        salaryID: '',
+        departmentID : '',
+        degreeID : '',
+        salaryID : ''
     });
 
     const handleChange = (event) => {
@@ -175,7 +228,13 @@ const UserManager = () => {
             ...prevState,
             [id]: value,
         }));
-
+        if (id === 'departmentID') {
+            setSelectedDepartment(value);
+        } else if (id === 'degreeID') {
+            setSelectedDegree(value);
+        } else if (id === 'salaryID') {
+            setSelectedSalary(value);
+        }
         const errors = {};
         if (!value & validator.isEmpty(user.fullname)) {
             errors.fullname = 'This field is required';
@@ -192,7 +251,7 @@ const UserManager = () => {
         if (!value & validator.isDate(user.birthDay)) {
             errors.birthDay = 'This field is required';
         }
-        if (!value & validator.isEmpty(user.adress)) {
+        if (!value & validator.isEmpty(user.address)) {
             errors.adress = 'This field is required';
         }
         setFormErrors(errors);
@@ -225,8 +284,10 @@ const UserManager = () => {
         if (Object.keys(errors).length === 0) {
             if (_id === undefined) {
                 setUser(user);
+                let dataa = {avatar : user.avatar,fullname : user.fullname,active : true,password : '123456',email : user.email,address : user.address,phone : user.phone,degreeID : user.degreeID,
+        departmentID : user.departmentID,salaryID : user.salaryID}
                 await userService
-                    .create(user)
+                    .create(dataa)
                     .then((res) => {
                         return res;
                     })
@@ -245,8 +306,10 @@ const UserManager = () => {
                 });
             } else {
                 setUser(user);
+                const dataUpdate = {_id : user._id,avatar : user.avatar,fullname : user.fullname,active : true,email : user.email,address : user.address,phone : user.phone,degreeID : user.degreeID,
+        departmentID : user.departmentID,salaryID : user.salaryID}
                 await userService
-                    .update(_id, user)
+                    .update(dataUpdate)
                     .then((res) => {
                         return res;
                     })
@@ -265,12 +328,11 @@ const UserManager = () => {
                 });
             }
             userService
-                .getAll({})
+                .getAll()
                 .then((response) => {
                     setJsonData(response.data);
                 })
                 .catch((error) => {
-                    console.log(error);
                 });
             closeModal();
         } else {
@@ -278,7 +340,25 @@ const UserManager = () => {
         }
     };
 
-    // data
+    const handleSubmit2 = async (event) => {
+        event.preventDefault();
+        userService.addRolestoUser({ id: userDetail._id, roles: rolesData }).then((res) => {
+            console.log(res);
+        });
+        toast.success('🦄 Cập Nhật quyền thành công !', {
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored',
+        });
+        closeModal2();
+    };
+
+    // // data
     const [optionDepartment, setOptionDepartment] = useState([]);
     const [optionDegree, setOptionDegree] = useState([]);
     const [optionSalary, setOptionSalary] = useState([]);
@@ -287,21 +367,32 @@ const UserManager = () => {
     const [selectedDepartment, setSelectedDepartment] = useState([]);
     const [selectedDegree, setSelectedDegree] = useState([]);
     const [selectedSalary, setSelectedSalary] = useState([]);
+    function handleChecked(event) {
+        let check = event.target.checked;
+        let check_id = event.target.value;
+        console.log(check_id);
+        if (check) {
+            setRolesData((items) => [...items, check_id]);
+        } else {
+            let data = rolesData.filter((item) => item !== check_id);
+            setRolesData(data);
+        }
 
+    }
     /// Modal confirm
     const handleCancel = () => {
         console.log('Cancel button clicked');
     };
 
-    // validation
-    const [formErrors, setFormErrors] = useState('123');
+    // // validation
+     const [formErrors, setFormErrors] = useState('123');
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-4">Department Posts</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-4">Manage User </h1>
             <div className="mt-8 flex justify-end">
                 <button className="bg-blue-500 hover:bg-red-300 text-white font-bold py-2 px-4 rounded" onClick={openModal}>
-                    +
+                    Thêm mới
                 </button>
             </div>
             <div className="w-full overflow-x-auto" style={{ paddingTop: '20px' }}>
@@ -310,52 +401,55 @@ const UserManager = () => {
                         <tr>
                             <th
                                 className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'name', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
                             >
-                                Name
+                                Full Name
                             </th>
                             <th
                                 className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'image', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
-                            >
-                                Image
-                            </th>
-                            <th
-                                className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'email', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
                             >
                                 Email
                             </th>
                             <th
                                 className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'phone', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
                             >
-                                Phone
+                                Số điện thoại
+                            </th>
+                            {/* <th
+                                className="px-4 py-2"
+                            >
+                                Lương
                             </th>
                             <th
                                 className="px-4 py-2"
-                                onClick={() => setSorting({ criteria: 'birthday', direction: sorting.direction === 'asc' ? 'desc' : 'asc' })}
                             >
-                                BirthDay
+                                Bằng Cấp
                             </th>
+                            <th
+                                className="px-4 py-2"
+                            >
+                                Phòng Ban
+                            </th> */}
                             <th className="px-4 py-2">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {jsonData
                             .filter((post) => post.active === true)
-                            .sort(getSortingFunction(sorting.criteria, sorting.direction))
                             .map((post, index) => (
                                 <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
                                     <td className="border px-4 py-2">{post.fullname}</td>
-                                    <td className="border px-4 py-2">
-                                        <img src={post.avatar} alt={post.name} className="w-24 h-auto" />
-                                    </td>
+                                    {/* <td className="border px-4 py-2">
+                                        <img src={post.avatar} alt={post.username} className="w-24 h-auto" />
+                                    </td> */}
                                     <td className="border px-4 py-2">{post.email}</td>
                                     <td className="border px-4 py-2">{post.phone}</td>
-                                    <td className="border px-4 py-2">
+                                    {/* <td className="border px-4 py-2">
                                         {new Date(post.birthDay).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                    </td>
+                                    </td> */}
+                                    {/* <td className="border px-4 py-2">{post.salary.name}</td>
+                                    <td className="border px-4 py-2">{post.degree.name}</td>
+                                    <td className="border px-4 py-2">{post.department.name}</td> */}
+
                                     <td className="border px-4 py-2">
                                         <div className="flex space-x-2">
                                             <button className="text-blue-600 hover:text-blue-800">
@@ -367,6 +461,7 @@ const UserManager = () => {
                                                             post.email,
                                                             post.phone,
                                                             post.address,
+                                                            post.password,
                                                             post.avatar,
                                                             post.fullname,
                                                             post.birthDay,
@@ -377,19 +472,17 @@ const UserManager = () => {
                                                     }
                                                 />
                                             </button>
-                                            <DialogBox
-                                                buttonText={
-                                                    <span className="text-red-600 cursor-pointer hover:text-red-800">
-                                                        <HiTrash size={20} />
-                                                    </span>
-                                                }
-                                                headerText="Delete Degree"
-                                                bodyText="Are you sure of your action? This action cannot be undone"
-                                                cancelText="Cancel"
-                                                confirmText="Confirm"
-                                                onCancel={handleCancel}
-                                                onConfirm={() => handleDelete(post._id)}
-                                            />
+                                            <button className="text-blue-600 hover:text-blue-800" title='Edit RolesToUser'>
+                                                <HiPencilAlt
+                                                    size={20}
+                                                    onClick={() =>
+                                                        handleEditRole(
+                                                            post._id,
+                                                            post.fullname
+                                                        )
+                                                    }
+                                                />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -399,7 +492,7 @@ const UserManager = () => {
             </div>
 
             <>
-                <Modal isOpen={isOpen} onClose={closeModal} title="My Modal">
+                 <Modal isOpen={isOpen} onClose={closeModal} title="My Modal">
                     <button
                         className="absolute top-0 right-0 mt-4 mr-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:shadow-outline"
                         onClick={closeModal}
@@ -415,7 +508,7 @@ const UserManager = () => {
                     <form onSubmit={(event) => handleSubmit(event, user._id)}>
                         <div className="mb-4">
                             <label htmlFor="fullname" className="block text-gray-700 font-bold mb-2">
-                                Fullname
+                                Full Name
                             </label>
                             <input
                                 type="text"
@@ -428,7 +521,7 @@ const UserManager = () => {
                             {user.fullname !== null && formErrors.fullname && <p className="text-red-500">{formErrors.fullname}</p>}
                         </div>
 
-                        <div className="mb-4">
+                         <div className="mb-4">
                             <label htmlFor="image" className="block text-gray-700 font-bold mb-2">
                                 Avatar
                             </label>
@@ -457,7 +550,7 @@ const UserManager = () => {
                             />
                             {user.email !== null && formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
                         </div>
-
+                        
                         <div className="mb-4">
                             <label htmlFor="phone" className="block text-gray-700 font-bold mb-2">
                                 Phone
@@ -499,21 +592,21 @@ const UserManager = () => {
                                 onBlur={handleChange}
                             />
                             {user.address !== null && formErrors.address && <p className="text-red-500">{formErrors.address}</p>}
-                        </div>
+                        </div> 
 
-                        <div className="mb-4">
+                         <div className="mb-4">
                             <label htmlFor="category" className="block text-gray-700 font-bold mb-2">
                                 Department
                             </label>
                             <select
                                 id="departmentID"
-                                value={selectedDepartment.name}
+                                value={selectedDepartment._id}
                                 onChange={handleChange}
                                 name="departmentID"
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             >
                                 {optionDepartment.map((option) => (
-                                    <option key={option._id} value={option.name}>
+                                    <option key={option._id} value={option._id}>
                                         {option.name}
                                     </option>
                                 ))}
@@ -526,13 +619,13 @@ const UserManager = () => {
                             </label>
                             <select
                                 id="degreeID"
-                                value={selectedDegree.name}
+                                value={selectedDegree._id}
                                 name="degreeID"
                                 onChange={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             >
                                 {optionDegree.map((option) => (
-                                    <option key={option._id} value={option.name}>
+                                    <option key={option._id} value={option._id}>
                                         {option.name}
                                     </option>
                                 ))}
@@ -545,25 +638,74 @@ const UserManager = () => {
                             </label>
                             <select
                                 id="salaryID"
-                                value={selectedSalary.name}
+                                value={selectedSalary._id}
                                 name="salaryID"
                                 onChange={handleChange}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             >
                                 {optionSalary.map((option) => (
-                                    <option key={option._id} value={option.name}>
+                                    <option key={option.id} value={option._id}>
                                         {option.name}
                                     </option>
                                 ))}
                             </select>
-                        </div>
+                        </div> 
 
                         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                             Lưu
                         </button>
                     </form>
-                </Modal>
+                </Modal> 
+
+                
             </>
+            <Modal isOpen={isOpen2} onClose={closeModal2} title={`Phân quyền cho ${ userDetail.fullname}`}>
+                    <button
+                        className="absolute top-0 right-0 mt-4 mr-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:shadow-outline"
+                        onClick={closeModal2}
+                    >
+                        <svg className="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path
+                                fillRule="evenodd"
+                                d="M18.293 3.293a1 1 0 00-1.414 0L10 8.586 4.707 3.293a1 1 0 10-1.414 1.414L8.586 10l-5.293 5.293a1 1 0 001.414 1.414L10 11.414l5.293 5.293a1 1 0 001.414-1.414L11.414 10l5.879-5.879a1 1 0 000-1.414z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                    </button>
+                    <form onSubmit={handleSubmit2}>
+                        <div className="mb-4" style={{ width: '400px' }}>
+                            {lstRole.map((item, index) => (
+                                <tr key={index} className={'bg-gray-100'} style={{ width: '400px' }}>
+                                    {(
+                                        <div
+                                            style={{
+                                                width: '200px',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                placeItems: 'flex-end',
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            <td className="px-4 py-2">{item.name}</td>
+                                            <td>
+                                                <input
+                                                    style={{ width: '20px' }}
+                                                    type="checkbox"
+                                                    value={item._id}
+                                                    checked={rolesData.includes(item._id) ? true : false}
+                                                    onChange={handleChecked}
+                                                />
+                                            </td>
+                                        </div>
+                                    )}
+                                </tr>
+                            ))}
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Lưu
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
             <ToastContainer />
         </div>
     );

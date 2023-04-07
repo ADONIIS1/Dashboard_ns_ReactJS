@@ -1,11 +1,11 @@
 import request from '~/utils/request';
 
 class departmentService {
-    getAll = async (req = {}) => {
+    getAll = async () => {
         // formBody {Object}
         try {
             const res = await request
-                .get('/department/getAll', JSON.stringify(req), {
+                .get('/department/getAll', {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -43,7 +43,7 @@ class departmentService {
         // formBody {Object}
         try {
             const res = await request
-                .get('/department/getAll', JSON.stringify(req), {
+                .post('/department/create', JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -77,10 +77,10 @@ class departmentService {
         }
     };
 
-    update = async (_id, req = {}) => {
+    update = async (req = {}) => {
         try {
             const res = await request
-                .put(`/department/${_id}/update`, JSON.stringify(req), {
+                .post(`/department/update`, JSON.stringify(req),{
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,

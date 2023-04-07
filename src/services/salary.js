@@ -1,11 +1,11 @@
 import request from '~/utils/request';
 
 class salaryService {
-    getAll = async (req = {}) => {
+    getAll = async () => {
         // formBody {Object}
         try {
             const res = await request
-                .get('/salary/getAll', JSON.stringify(req), {
+                .get('/salary/getAll', {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -43,7 +43,7 @@ class salaryService {
         // formBody {Object}
         try {
             const res = await request
-                .post('/salary/create', JSON.stringify(req), {
+                .post('/salary/create',JSON.stringify(req), {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -77,10 +77,10 @@ class salaryService {
         }
     };
 
-    update = async (_id, req = {}) => {
+    update = async (req = {}) => {
         try {
             const res = await request
-                .put(`/salary/${_id}/update`, JSON.stringify(req), {
+                .post(`/salary/update`, req, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,

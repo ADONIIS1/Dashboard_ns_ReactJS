@@ -1,11 +1,11 @@
 import request from '~/utils/request';
 
 class permissionService {
-    getAll = async (req = {}) => {
+    getAll = async () => {
         // formBody {Object}
         try {
             const res = await request
-                .get('role/getAllPermission', JSON.stringify(req), {
+                .get('role/getAllPermission', {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,

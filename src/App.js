@@ -36,7 +36,7 @@ function App() {
                                                 <RequireAuthorization
                                                     children={
                                                         <Layout>
-                                                            <Page />
+                                                            <Page roles={route.auth}/>
                                                         </Layout>
                                                     }
                                                     roles={route.auth}
